@@ -1,0 +1,4 @@
+#django项目的.gitignore文件
+
+**/__pycache__/
+**/migrations/
