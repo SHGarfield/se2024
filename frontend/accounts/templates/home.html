@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome to the Home Page!</h1>
+    <p>Welcome, {{ request.user.username }}!</p>
+    <a href="{% url 'logout' %}">Logout</a>
+    <a href="{% url 'user_delete' %}">Delete Account</a>
+    <!-- Add a link to delete account if needed -->
+    <!--
+    <a href="{% url 'user_delete' %}">Delete Account</a>
+    -->
+</body>
+</html>

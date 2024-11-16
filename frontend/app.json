@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/discover/discover",
+    "pages/map/map",
+    "pages/me/me",
+    "pages/logs/logs"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Weixin",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "tabBar":{
+    "list":[
+      {
+        "pagePath":"pages/discover/discover",
+        "text":"发现",
+        "iconPath": "static/images/discover.jpg",
+        "selectedIconPath": "static/images/discover_selected.jpg"
+      },
+      {
+        "pagePath":"pages/map/map",
+        "text":"地图",
+        "iconPath": "static/images/map.jpg",
+        "selectedIconPath": "static/images/map_selected.jpg"
+      },
+      {
+        "pagePath":"pages/me/me",
+        "text":"我的",
+        "iconPath":"static/images/me.jpg",
+        "selectedIconPath": "static/images/me_selected.jpg"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
