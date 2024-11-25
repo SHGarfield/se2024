@@ -9,13 +9,15 @@
 	</view>
 	<scroll-view class="detail-panel" :style="{ height: '50%', width: '100%' }" v-show="showDetail">
 		<view class="detail-content">
-			<text>地点名称：{{ location.standard_address}}\n</text>
-			<text>地点描述：{{ location.recommend}}附近\n</text>
-			<text>所在地区：{{location.district}}</text>
+			<text>地点名称：{{ current_location.standard_address}}\n</text>
+			<text>地点描述：{{ current_location.recommend}}附近\n</text>
+			<text>所在地区：{{current_location.district}}</text>
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
+			<button class="addMarkerButton" @click="addMarker">添加</button>
+			<button class="deleteMarkerButton" @click="deleteMarker">取消</button>
+			<!-- <button class="floating-button" @click="toggleDetailPanel">关闭</button> -->
 		</view>
 	</scroll-view>
-	<button class="floating-button" @click="toggleDetailPanel">关闭</button>
 </template>
 
 
@@ -40,6 +42,7 @@
 	});
 	// 定义响应式状态
 	const state = reactive({
+		marker_added:false,
 		tapEvent: "", // 点击事件状态
 		markers: [{ // 初始标记点数组
 			id: 0,
@@ -65,12 +68,20 @@
 	// 定义响应式数据
 	// const showDetail = ref(false);
 	// const location = ref({});
+	
+	// 定义响应式数据
+	const showDetail = ref(false);
+	const current_location = ref({});
 	const current_marker = ref(null)
+	
 	// 定义地图点击事件处理函数
 	const onCommonTap = async (e) => {
 		// locationInfo(qqmapsdk, e.detail,current_marker);
 
-
+		if(!state.marker_added){
+			state.markers.pop();
+		}
+		state.marker_added=false;
 		setTimeout(() => { // 避免markertap和commontap同时触发
 			if (state.tapEvent === "") { // 是commontap
 				console.log("Common tapped: ", e);
@@ -90,13 +101,11 @@
 		try {
 			const locationInfoRes = await locationInfo(qqmapsdk, e.detail);
 			showDetail.value = true;
-			location.value = {
+			current_location.value = {
 				standard_address: locationInfoRes.result.formatted_addresses.standard_address,
 				recommend:locationInfoRes.result.formatted_addresses.recommend,
 				district:locationInfoRes.result.ad_info.name,
 			}
-			console.log("location:", location.value)
-			console.log("res", locationInfoRes);
 		} catch (error) {
 			console.error("Error in locationInfo:", error);
 		}
@@ -111,23 +120,15 @@
 			state.tapEvent = "";
 		}, 200);
 	};
-	////////////
 
-
-	// 定义响应式数据
-	const showDetail = ref(false);
-	const location = ref({});
-	const info = ref({})
-
-	// 获取地点信息的方法
-	const getLocationInfo = (location) => {
-		// 这里应该是一个异步请求，获取地点信息
-		locationInfo(qqmapsdk, location);
-		return Promise.resolve({
-			name: '示例地点',
-			description: '这是一个示例地点的描述'
-		});
-	};
+	const addMarker = () =>{
+		state.marker_added=true;
+		toggleDetailPanel();
+	}
+	const deleteMarker = () =>{
+		state.markers.pop();
+		toggleDetailPanel();
+	}
 
 	// 切换详情面板显示状态的方法
 	const toggleDetailPanel = () => {
