@@ -1,49 +1,59 @@
-import {
-	onMounted,
-	onUnmounted,
-	ref
-} from 'vue';
 import QQMapWX from '../qqmap/qqmap-wx-jssdk.js';
 
-// 定义一个响应式变量来存储qqmapsdk实例
-// export const qqmapsdk = ref(null);
-
-// 使用onMounted生命周期钩子来实例化API
-// onMounted(() => {
-// 	qqmapsdk.value = new QQMapWX({
-// 		key: 'U4QBZ-N44CV-ORXP5-5JEHC-AQMBO-3FB64'
+/**
+ * 执行逆地理编码操作，将经纬度坐标转换为具体的地址信息。
+ * @param {Ref<QQMapWX>} qqmapsdk - 腾讯地图SDK的实例，必须已经初始化。
+ * @param {Object} location - 包含经纬度信息的对象。
+ * @param {number} location.latitude - 纬度值。
+ * @param {number} location.longitude - 经度值。
+ * 
+ * 使用示例：
+ * // 假设 qqmapsdk 是已经初始化的腾讯地图SDK实例
+ * // 假设 location 是包含经纬度的对象
+ * locationInfo(qqmapsdk, { latitude: 39.915, longitude: 116.404 });
+ */
+// export const locationInfo = (qqmapsdk,location,info) => {
+// 	// console.log("location:",location)
+// 	// console.log("qqmap.value(locationInfo):",qqmapsdk.value)
+// 	qqmapsdk.value.reverseGeocoder({
+// 		location: location, // 经纬度坐标
+// 		success: function(res) {
+// 			// 逆地理编码成功的回调
+// 			console.log("locationInfo(success)",res);
+// 			info=res;
+// 		},
+// 		fail: function(res) {
+// 			// 逆地理编码失败的回调
+// 			console.log("locationInfo(fail)",res);
+// 		},
+// 		complete: function(res) {
+// 			// 逆地理编码完成后的回调，无论成功或失败都会执行
+// 			// console.log(res);
+// 		}
 // 	});
-// 	// 调用接口
-// 	// searchLocation();
-// });
-////////
-
-// 定义locationInfo函数来执行逆地理编码操作
-export const locationInfo = (qqmapsdk,location) => {
-	// 这里以经纬度为北京天安门为例
-	// const location = {
-	// 	latitude: 39.915,
-	// 	longitude: 116.404
-	// };
-	// console.log("location:",location)
-	// console.log("qqmap.value(locationInfo):",qqmapsdk.value)
-	qqmapsdk.value.reverseGeocoder({
-		location: location, // 经纬度坐标
-		success: function(res) {
-			// 逆地理编码成功的回调
-			console.log(res);
-		},
-		fail: function(res) {
-			// 逆地理编码失败的回调
-			console.log(res);
-		},
-		complete: function(res) {
-			// 逆地理编码完成后的回调，无论成功或失败都会执行
-			console.log(res);
-		}
-	});
-};
+// };
 /////////
+export const locationInfo = (qqmapsdk, location) => {
+  return new Promise((resolve, reject) => {
+    qqmapsdk.value.reverseGeocoder({
+      location: location, // 经纬度坐标
+      success: function(res) {
+        // 逆地理编码成功的回调
+        console.log("locationInfo(success)", res);
+        resolve(res); // 在成功时解析 Promise 并返回结果
+      },
+      fail: function(res) {
+        // 逆地理编码失败的回调
+        console.log("locationInfo(fail)", res);
+        reject(res); // 在失败时拒绝 Promise 并返回错误信息
+      },
+      complete: function(res) {
+        // 逆地理编码完成后的回调，无论成功或失败都会执行
+        // console.log(res);
+      }
+    });
+  });
+};
 
 // 定义searchPlaces函数来执行搜索操作
 export const searchPlaces = () => {
