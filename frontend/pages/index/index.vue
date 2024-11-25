@@ -9,9 +9,12 @@
 	</view>
 	<scroll-view class="detail-panel" :style="{ height: '50%', width: '100%' }" v-show="showDetail">
 		<view class="detail-content">
+			<text>id：{{current_location.id}}\n</text>
 			<text>地点名称：{{ current_location.standard_address}}\n</text>
 			<text>地点描述：{{ current_location.recommend}}附近\n</text>
 			<text>所在地区：{{current_location.district}}</text>
+			<!-- <text v-if="current_location.id >= 1&&route">距离：{{polyline.value[current_location.id-1][0].distance}}</text> -->
+			<!-- <text>距离：{{polyline[current_location.value.])}}</text> -->
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
 			<button class="addMarkerButton" @click="addMarker">添加</button>
 			<button class="deleteMarkerButton" @click="deleteMarker">取消</button>
@@ -75,7 +78,7 @@
 	const current_location = ref({});
 	const current_marker = ref(null);
 	const polyline = ref([]);
-
+	const route_planned=ref(false);
 	// 定义地图点击事件处理函数
 	const onCommonTap = async (e) => {
 		// locationInfo(qqmapsdk, e.detail,current_marker);
@@ -87,7 +90,7 @@
 					state.markers.pop();
 				}
 				state.marker_added = false;
-				
+
 				console.log("Common tapped: ", e);
 				// 创建新marker
 				const newMarker = {
@@ -95,8 +98,8 @@
 					latitude: e.detail.latitude, // 点击事件返回的纬度
 					longitude: e.detail.longitude, // 点击事件返回的经度
 				};
-				current_marker.value = newMarker;
-				console.log("current_marker:", current_marker);
+				// current_marker.value = newMarker;
+				Object.assign(current_location.value, newMarker);
 				// 将新的标记点添加到数组中
 				state.markers.push(newMarker);
 				console.log(state.markers);
@@ -106,11 +109,17 @@
 		try {
 			const locationInfoRes = await locationInfo(qqmapsdk, e.detail);
 			showDetail.value = true;
-			current_location.value = {
-				standard_address: locationInfoRes.result.formatted_addresses.standard_address,
-				recommend: locationInfoRes.result.formatted_addresses.recommend,
-				district: locationInfoRes.result.ad_info.name,
-			}
+			// current_location.value = {
+			// 	standard_address: locationInfoRes.result.formatted_addresses.standard_address,
+			// 	recommend: locationInfoRes.result.formatted_addresses.recommend,
+			// 	district: locationInfoRes.result.ad_info.name,
+			// }
+			 Object.assign(current_location.value, {
+			    standard_address: locationInfoRes.result.formatted_addresses.standard_address,
+			    recommend: locationInfoRes.result.formatted_addresses.recommend,
+			    district: locationInfoRes.result.ad_info.name,
+			  });
+				console.log("current_marker:", current_marker);
 		} catch (error) {
 			console.error("Error in locationInfo:", error);
 		}
@@ -142,13 +151,14 @@
 		showDetail.value = !showDetail.value;
 	};
 
-	const planRoute=()=>{
-		for(let i=1;i<state.markers.length;i++){
-			console.log("route:",i)
-			planRouteAtom(state.markers[i-1],state.markers[i]);
+	const planRoute = () => {
+		for (let i = 1; i < state.markers.length; i++) {
+			console.log("route:", i)
+			planRouteAtom(state.markers[i - 1], state.markers[i]);
 		}
+		route_planned.value=true;//bug
 	}
-	const planRouteAtom = (start,end) => {
+	const planRouteAtom = (start, end) => {
 		qqmapsdk.value.direction({
 			mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
 			from: start, // 从表单中获取起始点
@@ -176,11 +186,15 @@
 				// 设置polyline属性，将路线显示出来,将解压坐标第一个数据作为起点
 				// latitude.value = pl[0].latitude;
 				// longitude.value = pl[0].longitude;
-				polyline.value.push ({
+				polyline.value.push({
 					points: pl,
 					color: '#FF0000DD',
-					width: 4
+					width: 4,
+					duration: res.result.routes[0].duration,
+					distance: res.result.routes[0].distance,
+					taxi_fare: res.result.routes[0].taxi_fare.fare
 				});
+				console.log("polyline:",polyline);
 			},
 			fail: function(error) {
 				console.error(error);
@@ -190,47 +204,47 @@
 			}
 		});
 	}
-	const formSubmit = (e) => {
-		// 调用距离计算接口
-		qqmapsdk.direction({
-			mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
-			from: e.start, // 从表单中获取起始点
-			to: e.dest, // 从表单中获取目的地
-			success: function(res) {
-				console.log(res);
-				var ret = res;
-				var coors = ret.result.routes[0].polyline,
-					pl = [];
-				// 坐标解压（返回的点串坐标，通过前向差分进行压缩）
-				var kr = 1000000;
-				for (var i = 2; i < coors.length; i++) {
-					coors[i] = Number(coors[i - 2]) + Number(coors[i]) / kr;
-				}
-				// 将解压后的坐标放入点串数组pl中
-				for (var i = 0; i < coors.length; i += 2) {
-					pl.push({
-						latitude: coors[i],
-						longitude: coors[i + 1]
-					});
-				}
-				console.log(pl);
-				// 设置polyline属性，将路线显示出来,将解压坐标第一个数据作为起点
-				latitude.value = pl[0].latitude;
-				longitude.value = pl[0].longitude;
-				polyline.value = [{
-					points: pl,
-					color: '#FF0000DD',
-					width: 4
-				}];
-			},
-			fail: function(error) {
-				console.error(error);
-			},
-			complete: function(res) {
-				console.log(res);
-			}
-		});
-	};
+	// const formSubmit = (e) => {
+	// 	// 调用距离计算接口
+	// 	qqmapsdk.direction({
+	// 		mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
+	// 		from: e.start, // 从表单中获取起始点
+	// 		to: e.dest, // 从表单中获取目的地
+	// 		success: function(res) {
+	// 			console.log(res);
+	// 			var ret = res;
+	// 			var coors = ret.result.routes[0].polyline,
+	// 				pl = [];
+	// 			// 坐标解压（返回的点串坐标，通过前向差分进行压缩）
+	// 			var kr = 1000000;
+	// 			for (var i = 2; i < coors.length; i++) {
+	// 				coors[i] = Number(coors[i - 2]) + Number(coors[i]) / kr;
+	// 			}
+	// 			// 将解压后的坐标放入点串数组pl中
+	// 			for (var i = 0; i < coors.length; i += 2) {
+	// 				pl.push({
+	// 					latitude: coors[i],
+	// 					longitude: coors[i + 1]
+	// 				});
+	// 			}
+	// 			console.log(pl);
+	// 			// 设置polyline属性，将路线显示出来,将解压坐标第一个数据作为起点
+	// 			latitude.value = pl[0].latitude;
+	// 			longitude.value = pl[0].longitude;
+	// 			polyline.value = [{
+	// 				points: pl,
+	// 				color: '#FF0000DD',
+	// 				width: 4,
+	// 			}];
+	// 		},
+	// 		fail: function(error) {
+	// 			console.error(error);
+	// 		},
+	// 		complete: function(res) {
+	// 			console.log(res);
+	// 		}
+	// 	});
+	// };
 </script>
 
 
