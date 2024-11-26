@@ -5,8 +5,9 @@
 			<button @click="onSearch">搜索</button>
 			<button @click="cancelSearch">取消</button>
 		</view>
-		<map class="map" :latitude="39.906217" :longitude="116.391275" :scale="12" :markers="state.markers"
-			:polyline="polyline" @markertap="onMarkerTap" @tap="onCommonTap">
+		<map class="map"  :longitude="mapCenterProxy.longitude"
+			:latitude="mapCenterProxy.latitude" :scale= "scale.value":markers="state.markers" :polyline="polyline"
+			@markertap="onMarkerTap" @tap="onCommonTap">
 			<!-- @controltap="con" 
 		    :controls="con"
 			@tap="onMapTap"-->
@@ -84,6 +85,11 @@
 	const current_location = ref({});
 	const polyline = ref([]);
 	const route_planned = ref(false);
+	const mapCenterProxy = ref({
+		latitude: 39.906217,
+		longitude: 116.391275
+	})
+	const scale=(16);
 	// function onSearch() {
 	//   // 执行搜索操作，这里只是打印搜索内容，实际项目中你可能需要调用API
 	//   console.log('搜索内容：', searchText.value);
@@ -119,6 +125,7 @@
 				searched_markers.value = mks; // 更新markers数组
 				console.log("sercherdmarkers:", searched_markers.value);
 				showResearchMarkers();
+				setMapCenterProxy(mks[0].latitude,mks[0].longitude);
 			},
 			fail: function(res) {
 				console.log(res);
@@ -128,11 +135,11 @@
 			}
 		});
 	};
-	
-	const cancelSearch=()=>{
-		searchText.value="";
+
+	const cancelSearch = () => {
+		searchText.value = "";
 		unshowDetailPanel();
-		unshowResearchMarkers();//恢复正常标点
+		unshowResearchMarkers(); //恢复正常标点
 	}
 
 	const showResearchMarkers = () => {
@@ -150,8 +157,8 @@
 		if (onSearching) {
 			state.markers = markers_store.value;
 		}
-		console.log("state.markers:",state.markers);
-		console.log("store_marker:",markers_store.value);
+		console.log("state.markers:", state.markers);
+		console.log("store_marker:", markers_store.value);
 		onSearching.value = false;
 	};
 	// 定义地图点击事件处理函数
@@ -247,12 +254,17 @@
 	// 	showDetail.value = !showDetail.value;
 	// }
 	//展示详情面板
-	const showDetailPanel =	() => {
-		showDetail.value=true;
-		}
+	const showDetailPanel = () => {
+		showDetail.value = true;
+	}
 	//关闭详情面板
 	const unshowDetailPanel = () => {
 		showDetail.value = false;
+	}
+	//设置地图中心点
+	const setMapCenterProxy=(latitude,longitude)=>{
+		mapCenterProxy.value.latitude=latitude;
+		mapCenterProxy.value.longitude=longitude;
 	}
 
 	const planRoute = () => {
