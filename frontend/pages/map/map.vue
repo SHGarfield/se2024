@@ -1,5 +1,10 @@
 <template>
 	<view class="full-screen">
+		<view class="search-page">
+			<input type="text" v-model="searchText" placeholder="请输入搜索内容" />
+			<button @click="onSearch">搜索</button>
+			<button @click="cancelSearch">取消</button>
+		</view>
 		<map class="map" :latitude="39.906217" :longitude="116.391275" :scale="12" :markers="state.markers"
 			:polyline="polyline" @markertap="onMarkerTap" @tap="onCommonTap">
 			<!-- @controltap="con" 
@@ -74,11 +79,81 @@
 	// const location = ref({});
 
 	// 定义响应式数据
+	const searchText = ref('');
 	const showDetail = ref(false);
 	const current_location = ref({});
-	const current_marker = ref(null);
 	const polyline = ref([]);
-	const route_planned=ref(false);
+	const route_planned = ref(false);
+	// function onSearch() {
+	//   // 执行搜索操作，这里只是打印搜索内容，实际项目中你可能需要调用API
+	//   console.log('搜索内容：', searchText.value);
+	//   // 这里可以编写你的搜索逻辑，例如调用API获取数据
+	// }
+	const searched_markers = ref([]); // 使用ref创建响应式数据，用于存储地图标记
+	const markers_store = ref([]);
+	const onSearching = ref(false);
+
+	const onSearch = () => {
+		searchLocation(qqmapsdk, searchText.value);
+		unshowDetailPanel();
+	};
+	// 事件触发，调用接口
+	const searchLocation = (qqmapsdk, search_text) => {
+		// 调用接口
+		qqmapsdk.value.search({
+			keyword: search_text, //搜索关键词
+			location: '39.980014,116.313972', //设置周边搜索中心点
+			success: function(res) { //搜索成功后的回调
+				let mks = [];
+				for (let i = 0; i < res.data.length; i++) {
+					mks.push({ // 获取返回结果，放到mks数组中
+						title: res.data[i].title,
+						id: mks.length,
+						latitude: res.data[i].location.lat,
+						longitude: res.data[i].location.lng,
+						// iconPath: "/resources/my_marker.png", //图标路径
+						width: 20,
+						height: 20
+					});
+				}
+				searched_markers.value = mks; // 更新markers数组
+				console.log("sercherdmarkers:", searched_markers.value);
+				showResearchMarkers();
+			},
+			fail: function(res) {
+				console.log(res);
+			},
+			complete: function(res) {
+				console.log(res);
+			}
+		});
+	};
+	
+	const cancelSearch=()=>{
+		searchText.value="";
+		unshowDetailPanel();
+		unshowResearchMarkers();//恢复正常标点
+	}
+
+	const showResearchMarkers = () => {
+		//如果第一次使用搜索，则存储当前的点
+		if (!onSearching) {
+			markers_store.value = state.markers;
+		}
+		//将显示数组变为搜索的点
+		state.markers = searched_markers.value;
+		//标记状态为搜索中
+		onSearching.value = true;
+	};
+
+	const unshowResearchMarkers = () => {
+		if (onSearching) {
+			state.markers = markers_store.value;
+		}
+		console.log("state.markers:",state.markers);
+		console.log("store_marker:",markers_store.value);
+		onSearching.value = false;
+	};
 	// 定义地图点击事件处理函数
 	const onCommonTap = async (e) => {
 		// locationInfo(qqmapsdk, e.detail,current_marker);
@@ -103,60 +178,89 @@
 				// 将新的标记点添加到数组中
 				state.markers.push(newMarker);
 				console.log(state.markers);
+
+				getSelectedLocationInfo(e.detail);
 			}
 		}, 100);
 		//点击marker有问题
+		// try {
+		// 	const locationInfoRes = await locationInfo(qqmapsdk, e.detail);
+		// 	showDetail.value = true;
+		// 	// current_location.value = {
+		// 	// 	standard_address: locationInfoRes.result.formatted_addresses.standard_address,
+		// 	// 	recommend: locationInfoRes.result.formatted_addresses.recommend,
+		// 	// 	district: locationInfoRes.result.ad_info.name,
+		// 	// }
+		// 	 Object.assign(current_location.value, {
+		// 	    standard_address: locationInfoRes.result.formatted_addresses.standard_address,
+		// 	    recommend: locationInfoRes.result.formatted_addresses.recommend,
+		// 	    district: locationInfoRes.result.ad_info.name,
+		// 	  });
+		// 		console.log("current_marker:", current_marker);
+		// } catch (error) {
+		// 	console.error("Error in locationInfo:", error);
+		// }
+
+	};
+	// 将try语句块封装成函数
+	const getSelectedLocationInfo = async (location) => {
 		try {
-			const locationInfoRes = await locationInfo(qqmapsdk, e.detail);
+			const locationInfoRes = await locationInfo(qqmapsdk, location);
 			showDetail.value = true;
-			// current_location.value = {
-			// 	standard_address: locationInfoRes.result.formatted_addresses.standard_address,
-			// 	recommend: locationInfoRes.result.formatted_addresses.recommend,
-			// 	district: locationInfoRes.result.ad_info.name,
-			// }
-			 Object.assign(current_location.value, {
-			    standard_address: locationInfoRes.result.formatted_addresses.standard_address,
-			    recommend: locationInfoRes.result.formatted_addresses.recommend,
-			    district: locationInfoRes.result.ad_info.name,
-			  });
-				console.log("current_marker:", current_marker);
+			Object.assign(current_location.value, {
+				standard_address: locationInfoRes.result.formatted_addresses.standard_address,
+				recommend: locationInfoRes.result.formatted_addresses.recommend,
+				district: locationInfoRes.result.ad_info.name,
+			});
+			console.log("current_location:", current_location);
 		} catch (error) {
 			console.error("Error in locationInfo:", error);
 		}
-
 	};
 
 	// 定义标记点点击事件处理函数
 	const onMarkerTap = (e) => {
-		toggleDetailPanel();
+		showDetailPanel();
 		state.tapEvent = e.type;
 		console.log("Marker tapped: ", e);
 		setTimeout(() => {
 			state.tapEvent = "";
+			getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+			Object.assign(current_location.value, {
+				id: e.markerId
+			});
 		}, 200);
 	};
 
 
 	const addMarker = () => {
 		state.marker_added = true;
-		toggleDetailPanel();
+		showDetailPanel();
 	}
 	const deleteMarker = () => {
-		state.markers.pop();
-		toggleDetailPanel();
+		state.markers.splice(current_location.id, 1); //有bug，如果删除前面的点，index没办法更新
+		unshowDetailPanel();
 	}
 
 	// 切换详情面板显示状态的方法
-	const toggleDetailPanel = () => {
-		showDetail.value = !showDetail.value;
-	};
+	// const toggleDetailPanel = () => {
+	// 	showDetail.value = !showDetail.value;
+	// }
+	//展示详情面板
+	const showDetailPanel =	() => {
+		showDetail.value=true;
+		}
+	//关闭详情面板
+	const unshowDetailPanel = () => {
+		showDetail.value = false;
+	}
 
 	const planRoute = () => {
 		for (let i = 1; i < state.markers.length; i++) {
 			console.log("route:", i)
 			planRouteAtom(state.markers[i - 1], state.markers[i]);
 		}
-		route_planned.value=true;//bug
+		route_planned.value = true; //bug
 	}
 	const planRouteAtom = (start, end) => {
 		qqmapsdk.value.direction({
@@ -194,7 +298,7 @@
 					distance: res.result.routes[0].distance,
 					taxi_fare: res.result.routes[0].taxi_fare.fare
 				});
-				console.log("polyline:",polyline);
+				console.log("polyline:", polyline);
 			},
 			fail: function(error) {
 				console.error(error);
@@ -204,47 +308,6 @@
 			}
 		});
 	}
-	// const formSubmit = (e) => {
-	// 	// 调用距离计算接口
-	// 	qqmapsdk.direction({
-	// 		mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
-	// 		from: e.start, // 从表单中获取起始点
-	// 		to: e.dest, // 从表单中获取目的地
-	// 		success: function(res) {
-	// 			console.log(res);
-	// 			var ret = res;
-	// 			var coors = ret.result.routes[0].polyline,
-	// 				pl = [];
-	// 			// 坐标解压（返回的点串坐标，通过前向差分进行压缩）
-	// 			var kr = 1000000;
-	// 			for (var i = 2; i < coors.length; i++) {
-	// 				coors[i] = Number(coors[i - 2]) + Number(coors[i]) / kr;
-	// 			}
-	// 			// 将解压后的坐标放入点串数组pl中
-	// 			for (var i = 0; i < coors.length; i += 2) {
-	// 				pl.push({
-	// 					latitude: coors[i],
-	// 					longitude: coors[i + 1]
-	// 				});
-	// 			}
-	// 			console.log(pl);
-	// 			// 设置polyline属性，将路线显示出来,将解压坐标第一个数据作为起点
-	// 			latitude.value = pl[0].latitude;
-	// 			longitude.value = pl[0].longitude;
-	// 			polyline.value = [{
-	// 				points: pl,
-	// 				color: '#FF0000DD',
-	// 				width: 4,
-	// 			}];
-	// 		},
-	// 		fail: function(error) {
-	// 			console.error(error);
-	// 		},
-	// 		complete: function(res) {
-	// 			console.log(res);
-	// 		}
-	// 	});
-	// };
 </script>
 
 
@@ -289,5 +352,38 @@
 		border: none;
 		border-radius: 50%;
 		z-index: 101;
+	}
+
+	/* 搜索框 */
+	.search-page {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		width: 87%;
+		padding: 10px;
+		background-color: white;
+		top: 2vh;
+		/* 确保搜索栏在地图上方 */
+		z-index: 10;
+		border-radius: 20rpx;
+		/* 水平偏移 0px，垂直偏移 4px，模糊半径 10px，颜色为黑色，透明度为 0.3 */
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	input[type="text"] {
+		flex: 1;
+		border-right: 1px solid #ccc;
+		padding: 10px;
+		border-radius: 4px;
+	}
+
+	button {
+		padding: 0rpx 10px;
+		font-size: 30rpx;
+		background-color: #007aff;
+		color: white;
+		border: none;
+		border-radius: 10rpx;
+		margin-left: 10px;
 	}
 </style>

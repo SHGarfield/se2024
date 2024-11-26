@@ -34,40 +34,25 @@ import QQMapWX from '../qqmap/qqmap-wx-jssdk.js';
 // };
 /////////
 export const locationInfo = (qqmapsdk, location) => {
-  return new Promise((resolve, reject) => {
-    qqmapsdk.value.reverseGeocoder({
-      location: location, // 经纬度坐标
-      success: function(res) {
-        // 逆地理编码成功的回调
-        console.log("locationInfo(success)", res);
-        resolve(res); // 在成功时解析 Promise 并返回结果
-      },
-      fail: function(res) {
-        // 逆地理编码失败的回调
-        console.log("locationInfo(fail)", res);
-        reject(res); // 在失败时拒绝 Promise 并返回错误信息
-      },
-      complete: function(res) {
-        // 逆地理编码完成后的回调，无论成功或失败都会执行
-        // console.log(res);
-      }
-    });
-  });
-};
-
-// 定义searchPlaces函数来执行搜索操作
-export const searchPlaces = () => {
-	qqmapsdk.value.search({
-		keyword: '酒店',
-		success: function(res) {
-			console.log(res);
-		},
-		fail: function(res) {
-			console.log(res);
-		},
-		complete: function(res) {
-			console.log(res);
-		}
+	return new Promise((resolve, reject) => {
+		qqmapsdk.value.reverseGeocoder({
+			location: location, // 经纬度坐标
+			success: function(res) {
+				// 逆地理编码成功的回调
+				console.log("locationInfo(success)", res);
+				resolve(res); // 在成功时解析 Promise 并返回结果
+			},
+			fail: function(res) {
+				// 逆地理编码失败的回调
+				console.log("locationInfo(fail)", res);
+				console.log(location);
+				reject(res); // 在失败时拒绝 Promise 并返回错误信息
+			},
+			complete: function(res) {
+				// 逆地理编码完成后的回调，无论成功或失败都会执行
+				// console.log(res);
+			}
+		});
 	});
 };
 
