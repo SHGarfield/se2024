@@ -1,7 +1,7 @@
 <template>
   <view class="my">
     <!-- 未登录状态 -->
-    <view class="user-card" v-if=isLogin.value>
+    <view class="user-card" v-if=!isLogin.value>
       <view class="user-info">
         <!-- 左侧头像 -->
         <view class="avatar-box">
@@ -66,7 +66,7 @@ function handleEdit(){
 }
 function handleLogin(){
   uni.navigateTo({
-    url: '/pages/userinfo/userinfo'
+    url: '/pages/login/login'
   })
 }
 function handleOption(){
@@ -76,7 +76,7 @@ function handleOption(){
 }
 function handlePlan(){
   uni.switchTab({
-  	url: '/pages/recommend/recommend'
+  	url: '/pages/find/find'
   })
 }
 const listData = ref([

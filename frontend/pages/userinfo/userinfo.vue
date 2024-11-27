@@ -126,6 +126,9 @@ const handleEdit = (type) => {
 const handleSave = () => {
   // 保存用户信息
   console.log('保存用户信息')
+  
+  //jfy:
+  uni.navigateBack()
 }
 </script>
 

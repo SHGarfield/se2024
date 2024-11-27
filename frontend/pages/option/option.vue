@@ -25,6 +25,8 @@
     <view class="bottom-buttons">
       <button class="switch-account" @tap="switchAccount">切换账号</button>
       <button class="logout" @tap="logout">退出登录</button>
+	  <!-- jfy -->
+	  <button class="logout" @tap="goBack">返回</button>
     </view>
   </view>
 </template>

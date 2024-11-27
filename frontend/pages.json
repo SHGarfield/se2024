@@ -7,9 +7,9 @@
 			}
 		},
 		{
-			"path" : "pages/my/my",
-			"style" : 
-			{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText" : "登录"
 			}
 		},
 		{
@@ -17,12 +17,6 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "发现"
-			}
-	  },
-	  {
-			"path": "pages/recommend/recommend",
-			"style": {
-				"navigationBarTitleText": "推荐"
 			}
 	  },
 	  {
@@ -74,5 +68,9 @@
 			}
 		]
 	},
-	"uniIdRouter": {}
+	
+	"uniIdRouter": {},
+	"globalStyle": {
+		"navigationBarBackgroundColor": "#2a82fe"
+	}
 }
