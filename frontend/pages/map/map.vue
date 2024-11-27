@@ -113,9 +113,16 @@
 
 	const showResearchMarkers = () => {
 		//如果第一次使用搜索，则存储当前的点
-		if (!onSearching) {
-			markers_store.value = state.markers;
+		if (!onSearching.value) {
+			console.log(1);
+			console.log("brfore",markers_store);
+			for(let i=0;i<state.markers.length;i++){
+				markers_store.value.push(state.markers[i]);
+			}
+			// markers_store.value = state.markers;
+			console.log("store",markers_store);
 		}
+		console.log(2)
 		//将显示数组变为搜索的点
 		state.markers = searched_markers.value;
 		//标记状态为搜索中
@@ -123,7 +130,7 @@
 	};
 
 	const unshowResearchMarkers = () => {
-		if (onSearching) {
+		if (onSearching.value) {
 			state.markers = markers_store.value;
 		}
 		console.log("state.markers:", state.markers);
@@ -182,7 +189,9 @@
 			state.tapEvent = "";
 			getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
 			Object.assign(current_location.value, {
-				id: e.markerId
+				id: e.markerId,
+				latitude: state.markers[e.markerId].latitude,
+				longitude: state.markers[e.markerId].longitude
 			});
 		}, 200);
 	};
@@ -196,25 +205,25 @@
 
 	const addMarker = () => {
 		state.marker_added = true;
-		if (!onSearching) {
+		if (!onSearching.value) {
 			showDetailPanel();
 		} else {
 			console.log(current_location.value);
 			markers_store.value.push(getContentFromObject(current_location));
-			console.log("mar",markers_store);
-			// unshowResearchMarkers();
+			console.log("mar", markers_store);
+			unshowResearchMarkers();
 		}
 	}
-	
-	const getContentFromObject=(object)=>{
+
+	const getContentFromObject = (object) => {
 		const objectvalue = object.value;
 		const newMarker = {
-		  id: objectvalue.id,
-		  latitude: objectvalue.latitude,
-		  longitude: objectvalue.longitude,
-		  standard_address: objectvalue.standard_address,
-		  recommend: objectvalue.recommend,
-		  // 复制其他需要的属性
+			id: objectvalue.id,
+			latitude: objectvalue.latitude,
+			longitude: objectvalue.longitude,
+			standard_address: objectvalue.standard_address,
+			recommend: objectvalue.recommend,
+			// 复制其他需要的属性
 		};
 		return newMarker;
 	}
@@ -253,7 +262,6 @@
 	// 地点搜索
 	const searchLocation = (qqmapsdk, search_text) => {
 		// 调用接口
-		console.log("searchtext", search_text);
 		qqmapsdk.value.search({
 			keyword: search_text, //搜索关键词
 			location: {
@@ -274,9 +282,9 @@
 					});
 				}
 				searched_markers.value = mks; // 更新markers数组
-				console.log("sercherdmarkers:", searched_markers.value);
+				// console.log("sercherdmarkers:", searched_markers.value);
 				showResearchMarkers();
-				console.log("mks[0]", mks[0]);
+				// console.log("mks[0]", mks[0]);
 				setMapCenterProxy(mks[0].latitude, mks[0].longitude);
 			},
 			fail: function(res) {
