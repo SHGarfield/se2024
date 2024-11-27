@@ -5,11 +5,11 @@
 			<button @click="onSearch">搜索</button>
 			<button @click="cancelSearch">取消</button>
 		</view>
-		<map class="map"  :longitude="mapCenterProxy.longitude"
-			:latitude="mapCenterProxy.latitude" :scale= "scale.value":markers="state.markers" :polyline="polyline"
-			@markertap="onMarkerTap" @tap="onCommonTap">
+		<map class="map" :longitude="mapCenterProxy.longitude" :latitude="mapCenterProxy.latitude"
+			:include-points="state.markers" :markers="state.markers" :polyline="polyline" @markertap="onMarkerTap"
+			@tap="onCommonTap" @regionchange="onRegionChange">
 			<!-- @controltap="con" 
-		    :controls="con"
+		    :controls="con":scale="scale.value"
 			@tap="onMapTap"-->
 		</map>
 	</view>
@@ -89,7 +89,7 @@
 		latitude: 39.906217,
 		longitude: 116.391275
 	})
-	const scale=(16);
+	const scale = (16);
 	// function onSearch() {
 	//   // 执行搜索操作，这里只是打印搜索内容，实际项目中你可能需要调用API
 	//   console.log('搜索内容：', searchText.value);
@@ -106,9 +106,13 @@
 	// 事件触发，调用接口
 	const searchLocation = (qqmapsdk, search_text) => {
 		// 调用接口
+		console.log("searchtext", search_text);
 		qqmapsdk.value.search({
 			keyword: search_text, //搜索关键词
-			location: '39.980014,116.313972', //设置周边搜索中心点
+			location: {
+				latitude: mapCenterProxy.value.latitude,
+				longitude: mapCenterProxy.value.longitude
+			}, //设置周边搜索中心点
 			success: function(res) { //搜索成功后的回调
 				let mks = [];
 				for (let i = 0; i < res.data.length; i++) {
@@ -125,7 +129,8 @@
 				searched_markers.value = mks; // 更新markers数组
 				console.log("sercherdmarkers:", searched_markers.value);
 				showResearchMarkers();
-				setMapCenterProxy(mks[0].latitude,mks[0].longitude);
+				console.log("mks[0]", mks[0]);
+				setMapCenterProxy(mks[0].latitude, mks[0].longitude);
 			},
 			fail: function(res) {
 				console.log(res);
@@ -189,25 +194,6 @@
 				getSelectedLocationInfo(e.detail);
 			}
 		}, 100);
-		//点击marker有问题
-		// try {
-		// 	const locationInfoRes = await locationInfo(qqmapsdk, e.detail);
-		// 	showDetail.value = true;
-		// 	// current_location.value = {
-		// 	// 	standard_address: locationInfoRes.result.formatted_addresses.standard_address,
-		// 	// 	recommend: locationInfoRes.result.formatted_addresses.recommend,
-		// 	// 	district: locationInfoRes.result.ad_info.name,
-		// 	// }
-		// 	 Object.assign(current_location.value, {
-		// 	    standard_address: locationInfoRes.result.formatted_addresses.standard_address,
-		// 	    recommend: locationInfoRes.result.formatted_addresses.recommend,
-		// 	    district: locationInfoRes.result.ad_info.name,
-		// 	  });
-		// 		console.log("current_marker:", current_marker);
-		// } catch (error) {
-		// 	console.error("Error in locationInfo:", error);
-		// }
-
 	};
 	// 将try语句块封装成函数
 	const getSelectedLocationInfo = async (location) => {
@@ -238,21 +224,30 @@
 			});
 		}, 200);
 	};
-
+	//视野变化则更新地图中心坐标
+	const onRegionChange = (e) => {
+		console.log(e);
+		if (e.type == "end") {
+			setMapCenterProxy(e.detail.centerLocation.latitude,e.detail.centerLocation.longitude);
+		}
+	}
 
 	const addMarker = () => {
 		state.marker_added = true;
 		showDetailPanel();
 	}
 	const deleteMarker = () => {
-		state.markers.splice(current_location.id, 1); //有bug，如果删除前面的点，index没办法更新
+		// state.markers.splice(current_location.id, 1); //有bug，如果删除前面的点，index没办法更新
+		console.log("current:", current_location.value.id);
+		console.log("state.markers", state.markers);
+		state.markers.splice(findMarkerById(state.markers, current_location.value.id), 1);
 		unshowDetailPanel();
 	}
 
-	// 切换详情面板显示状态的方法
-	// const toggleDetailPanel = () => {
-	// 	showDetail.value = !showDetail.value;
-	// }
+	//
+	const findMarkerById = (markers, id) => {
+		return markers.findIndex(item => item.id === id);
+	}
 	//展示详情面板
 	const showDetailPanel = () => {
 		showDetail.value = true;
@@ -262,11 +257,14 @@
 		showDetail.value = false;
 	}
 	//设置地图中心点
-	const setMapCenterProxy=(latitude,longitude)=>{
-		mapCenterProxy.value.latitude=latitude;
-		mapCenterProxy.value.longitude=longitude;
-	}
+	const setMapCenterProxy = (latitude, longitude) => {
+		console.log(latitude, longitude);
+		mapCenterProxy.value.latitude = latitude;
+		mapCenterProxy.value.longitude = longitude;
 
+		console.log(latitude, longitude);
+	}
+	//设置所有点串联的路线
 	const planRoute = () => {
 		for (let i = 1; i < state.markers.length; i++) {
 			console.log("route:", i)
@@ -274,6 +272,7 @@
 		}
 		route_planned.value = true; //bug
 	}
+	//设置相邻两点路线
 	const planRouteAtom = (start, end) => {
 		qqmapsdk.value.direction({
 			mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
