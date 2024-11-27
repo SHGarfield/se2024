@@ -103,43 +103,7 @@
 		searchLocation(qqmapsdk, searchText.value);
 		unshowDetailPanel();
 	};
-	// 事件触发，调用接口
-	const searchLocation = (qqmapsdk, search_text) => {
-		// 调用接口
-		console.log("searchtext", search_text);
-		qqmapsdk.value.search({
-			keyword: search_text, //搜索关键词
-			location: {
-				latitude: mapCenterProxy.value.latitude,
-				longitude: mapCenterProxy.value.longitude
-			}, //设置周边搜索中心点
-			success: function(res) { //搜索成功后的回调
-				let mks = [];
-				for (let i = 0; i < res.data.length; i++) {
-					mks.push({ // 获取返回结果，放到mks数组中
-						title: res.data[i].title,
-						id: mks.length,
-						latitude: res.data[i].location.lat,
-						longitude: res.data[i].location.lng,
-						// iconPath: "/resources/my_marker.png", //图标路径
-						width: 20,
-						height: 20
-					});
-				}
-				searched_markers.value = mks; // 更新markers数组
-				console.log("sercherdmarkers:", searched_markers.value);
-				showResearchMarkers();
-				console.log("mks[0]", mks[0]);
-				setMapCenterProxy(mks[0].latitude, mks[0].longitude);
-			},
-			fail: function(res) {
-				console.log(res);
-			},
-			complete: function(res) {
-				console.log(res);
-			}
-		});
-	};
+
 
 	const cancelSearch = () => {
 		searchText.value = "";
@@ -187,10 +151,8 @@
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
-				// 将新的标记点添加到数组中
+				// 将新的标记点添加到数组中,展示
 				state.markers.push(newMarker);
-				console.log(state.markers);
-
 				getSelectedLocationInfo(e.detail);
 			}
 		}, 100);
@@ -226,16 +188,37 @@
 	};
 	//视野变化则更新地图中心坐标
 	const onRegionChange = (e) => {
-		console.log(e);
+		// console.log(e);
 		if (e.type == "end") {
-			setMapCenterProxy(e.detail.centerLocation.latitude,e.detail.centerLocation.longitude);
+			setMapCenterProxy(e.detail.centerLocation.latitude, e.detail.centerLocation.longitude);
 		}
 	}
 
 	const addMarker = () => {
 		state.marker_added = true;
-		showDetailPanel();
+		if (!onSearching) {
+			showDetailPanel();
+		} else {
+			console.log(current_location.value);
+			markers_store.value.push(getContentFromObject(current_location));
+			console.log("mar",markers_store);
+			// unshowResearchMarkers();
+		}
 	}
+	
+	const getContentFromObject=(object)=>{
+		const objectvalue = object.value;
+		const newMarker = {
+		  id: objectvalue.id,
+		  latitude: objectvalue.latitude,
+		  longitude: objectvalue.longitude,
+		  standard_address: objectvalue.standard_address,
+		  recommend: objectvalue.recommend,
+		  // 复制其他需要的属性
+		};
+		return newMarker;
+	}
+
 	const deleteMarker = () => {
 		// state.markers.splice(current_location.id, 1); //有bug，如果删除前面的点，index没办法更新
 		console.log("current:", current_location.value.id);
@@ -248,22 +231,63 @@
 	const findMarkerById = (markers, id) => {
 		return markers.findIndex(item => item.id === id);
 	}
+
 	//展示详情面板
 	const showDetailPanel = () => {
 		showDetail.value = true;
 	}
+
 	//关闭详情面板
 	const unshowDetailPanel = () => {
 		showDetail.value = false;
 	}
+
 	//设置地图中心点
 	const setMapCenterProxy = (latitude, longitude) => {
-		console.log(latitude, longitude);
+		// console.log(latitude, longitude);
 		mapCenterProxy.value.latitude = latitude;
 		mapCenterProxy.value.longitude = longitude;
-
-		console.log(latitude, longitude);
+		// console.log(latitude, longitude);
 	}
+
+	// 地点搜索
+	const searchLocation = (qqmapsdk, search_text) => {
+		// 调用接口
+		console.log("searchtext", search_text);
+		qqmapsdk.value.search({
+			keyword: search_text, //搜索关键词
+			location: {
+				latitude: mapCenterProxy.value.latitude,
+				longitude: mapCenterProxy.value.longitude
+			}, //设置周边搜索中心点
+			success: function(res) { //搜索成功后的回调
+				let mks = [];
+				for (let i = 0; i < res.data.length; i++) {
+					mks.push({ // 获取返回结果，放到mks数组中
+						title: res.data[i].title,
+						id: mks.length,
+						latitude: res.data[i].location.lat,
+						longitude: res.data[i].location.lng,
+						// iconPath: "/resources/my_marker.png", //图标路径
+						width: 20,
+						height: 20
+					});
+				}
+				searched_markers.value = mks; // 更新markers数组
+				console.log("sercherdmarkers:", searched_markers.value);
+				showResearchMarkers();
+				console.log("mks[0]", mks[0]);
+				setMapCenterProxy(mks[0].latitude, mks[0].longitude);
+			},
+			fail: function(res) {
+				console.log(res);
+			},
+			complete: function(res) {
+				console.log(res);
+			}
+		});
+	};
+
 	//设置所有点串联的路线
 	const planRoute = () => {
 		for (let i = 1; i < state.markers.length; i++) {
@@ -272,6 +296,7 @@
 		}
 		route_planned.value = true; //bug
 	}
+
 	//设置相邻两点路线
 	const planRouteAtom = (start, end) => {
 		qqmapsdk.value.direction({
