@@ -14,6 +14,13 @@
 		</map>
 	</view>
 	<scroll-view class="detail-panel" :style="{ height: '50%', width: '100%' }" v-show="showDetail">
+		<view>
+		  <picker mode="date" :value="beginDate" @change="onDateChange">
+		    <view class="picker">
+		      // 更改出行日期：{{ beginDate }}
+		    </view>
+		  </picker>
+		</view>
 		<view class="detail-content">
 			<text>id：{{current_location.id}}\n</text>
 			<text>地点名称：{{ current_location.standard_address}}\n</text>
@@ -28,6 +35,7 @@
 			<!-- <button class="floating-button" @click="toggleDetailPanel">关闭</button> -->
 		</view>
 	</scroll-view>
+	
 </template>
 
 
@@ -50,6 +58,11 @@
 		// 页面加载时执行的初始化操作
 		setupQQMap(qqmapsdk);
 	});
+	const beginDate = ref(new Date().toISOString().slice(0, 10)); // 使用ref创建响应式数据
+	
+	const onDateChange = (e) => {
+	  beginDate.value = e.detail.value; // 更新选择的日期
+	};
 	// 定义响应式状态
 	const state = reactive({
 		marker_added: false,
