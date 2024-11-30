@@ -367,9 +367,15 @@
 		console.log("current:", current_location.value.id);
 		console.log("state.markers", state.markers);
 		state.markers.splice(findMarkerById(state.markers, current_location.value.id), 1);
+		updateId();
 		unshowDetailPanel();
 	}
 
+	const updateId=()=>{
+		state.markers.forEach((marker, index) => {
+		    marker.id = index;
+		  });
+	}
 	//
 	const findMarkerById = (markers, id) => {
 		return markers.findIndex(item => item.id === id);
