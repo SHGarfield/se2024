@@ -25,7 +25,8 @@
 			<text>id：{{current_location.id}}\n</text>
 			<text>地点名称：{{ current_location.standard_address}}\n</text>
 			<text>地点描述：{{ current_location.recommend}}附近\n</text>
-			<text>所在地区：{{current_location.district}}</text>
+			<text>所在地区：{{current_location.district}}\n</text>
+			<text>第{{current_location.tourDate}}天的第{{current_location.tourOrder}}个行程</text>
 			<!-- <text v-if="current_location.id >= 1&&route">距离：{{polyline.value[current_location.id-1][0].distance}}</text> -->
 			<!-- <text>距离：{{polyline[current_location.value.])}}</text> -->
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
@@ -41,14 +42,15 @@
 			<view class="modalPage">
 				<view class="picker-container">
 					<text>添加日程到第</text>
-					<picker mode="selector" :range="pickerRange" @change="onPickerChange1">
+					<picker mode="selector" :range="pickerRangeDate" @change="onPickerChange1">
 						<view class="picker">{{ pickerValue1 }}</view>
 					</picker>
 					<text>天</text>
 				</view>
 				<view class="picker-container">
 					<text>当日第</text>
-					<picker mode="selector" :range="pickerRange" @change="onPickerChange2">
+					<picker mode="selector" :range="pickerRangeOrder" @change="onPickerChange2"
+						:disabled="!isPicker2Available">
 						<view class="picker">{{ pickerValue2 }}</view>
 					</picker>
 					<text>个行程</text>
@@ -68,7 +70,9 @@
 	import {
 		ref,
 		reactive,
-		onMounted
+		onMounted,
+		toValue,
+		computed,
 	} from 'vue';
 	import {
 		setupQQMap
@@ -82,50 +86,6 @@
 		// 页面加载时执行的初始化操作
 		setupQQMap(qqmapsdk);
 	});
-
-	const modalVisible = ref(false);
-	const pickerRange = ref(Array.from({
-		length: 50
-	}, (_, index) => index + 1));
-	const pickerValue1 = ref('请选择');
-	const pickerValue2 = ref('请选择');
-	const addMarkerToRoute = () => {
-		showModal();
-		unshowDetailPanel();
-	}
-	const showModal = () => {
-		modalVisible.value = true;
-	};
-
-	const hideModal = () => {
-		modalVisible.value = false;
-	};
-
-	const onPickerChange1 = (e) => {
-		pickerValue1.value = pickerRange.value[e.detail.value];
-	};
-
-	const onPickerChange2 = (e) => {
-		pickerValue2.value = pickerRange.value[e.detail.value];
-	};
-
-	const confirmDate = () => {
-		hideModal();
-		addMarker();
-	}
-
-	const cancelDate = () => {
-		hideModal();
-		pickerValue1.value = '请选择';
-		pickerValue2.value = '请选择';
-	}
-
-
-	const beginDate = ref(new Date().toISOString().slice(0, 10)); // 使用ref创建响应式数据
-
-	const onDateChange = (e) => {
-		beginDate.value = e.detail.value; // 更新选择的日期
-	};
 	// 定义响应式状态
 	const state = reactive({
 		marker_added: false,
@@ -134,6 +94,8 @@
 			id: 0,
 			latitude: 39.906217,
 			longitude: 116.391275,
+			tourDate: 0,
+			tourOrder: 1,
 			callout: {
 				content: '这里是气泡内容',
 				display: 'BYCLICK',
@@ -150,6 +112,94 @@
 			}
 		}]
 	});
+	const isPicker2Available = ref(false);
+	const getAllDate = () => {
+		console.log("state markers(getAllDate)", state.markers);
+		if (state.markers.length > 1 && state.markers[state.markers.length - 2].tourDate) {
+			return state.markers[state.markers.length - 2].tourDate;
+		}
+		return 0;
+	}
+	const getAllOrder = () => {
+		console.log("state markers(getAllOrder)", state.markers);
+		// if (state.markers.length > 1&&state.markers[state.markers.length - 2].tourDate) {
+		// 	return state.markers[state.markers.length - 2].tourDate;
+		// }
+		// return 0;
+		for (let i = state.markers.length - 2; i >= 0; i--) {
+			console.log("markerDate",state.markers[i].tourDate);
+			console.log("value1",pickerValue1.value);
+			if (state.markers[i].tourDate == pickerValue1.value) {
+				return state.markers[i].tourOrder;
+			}
+		}
+		return 0;
+	}
+	const modalVisible = ref(false);
+	// const pickerRange = ref(Array.from({
+	// 	length: state.markers.length
+	// }, (_, index) => index + 1));
+	const pickerRangeDate = computed(() => {
+		return Array.from({
+			length: getAllDate() + 1
+		}, (_, index) => index + 1);
+	});
+	const pickerRangeOrder = computed(() => {
+		return Array.from({
+			length: getAllOrder() + 1
+		}, (_, index) => index + 1);
+	});
+
+	const pickerValue1 = ref('请选择');
+	const pickerValue2 = ref('请选择');
+	const addMarkerToRoute = () => {
+		showModal();
+		unshowDetailPanel();
+	}
+	const showModal = () => {
+		modalVisible.value = true;
+		isPicker2Available.value = false;
+	};
+
+	const hideModal = () => {
+		modalVisible.value = false;
+	};
+
+	const onPickerChange1 = (e) => {
+		pickerValue1.value = pickerRangeDate.value[e.detail.value];
+		if (pickerValue1.value == "请选择") {
+			isPicker2Available.value = false;
+		} else {
+			isPicker2Available.value = true;
+		}
+	};
+
+	const onPickerChange2 = (e) => {
+		pickerValue2.value = pickerRangeOrder.value[e.detail.value];
+	};
+
+	const confirmDate = () => {
+		hideModal();
+		addMarker();
+		clearDateSelecter();
+	}
+
+	const clearDateSelecter = () => {
+		pickerValue1.value = '请选择';
+		pickerValue2.value = '请选择';
+	}
+	const cancelDate = () => {
+		hideModal();
+		clearDateSelecter();
+	}
+
+
+	const beginDate = ref(new Date().toISOString().slice(0, 10)); // 使用ref创建响应式数据
+
+	const onDateChange = (e) => {
+		beginDate.value = e.detail.value; // 更新选择的日期
+	};
+
 
 	// 定义响应式数据
 	// const showDetail = ref(false);
@@ -267,7 +317,9 @@
 			Object.assign(current_location.value, {
 				id: e.markerId,
 				latitude: state.markers[e.markerId].latitude,
-				longitude: state.markers[e.markerId].longitude
+				longitude: state.markers[e.markerId].longitude,
+				tourDate: state.markers[e.markerId].tourDate,
+				tourOrder: state.markers[e.markerId].tourOrder,
 			});
 		}, 200);
 	};
@@ -282,7 +334,13 @@
 	const addMarker = () => {
 		state.marker_added = true;
 		if (!onSearching.value) {
-			showDetailPanel();
+			// showDetailPanel();
+			Object.assign(
+				state.markers[state.markers.length - 1], {
+					tourDate: pickerValue1.value,
+					tourOrder: pickerValue2.value,
+				});
+			console.log("state markers(add marker)", state.markers);
 		} else {
 			console.log(current_location.value);
 			markers_store.value.push(getContentFromObject(current_location));
