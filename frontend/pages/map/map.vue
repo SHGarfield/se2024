@@ -2,8 +2,8 @@
 	<view class="full-screen">
 		<view class="search-page">
 			<input type="text" v-model="searchText" placeholder="请输入搜索内容" />
-			<button @click="onSearch">搜索</button>
-			<button @click="cancelSearch">取消</button>
+			<button class="searchBarButton" @click="onSearch">搜索</button>
+			<button class="searchBarButton" @click="cancelSearch">取消</button>
 		</view>
 		<map class="map" :longitude="mapCenterProxy.longitude" :latitude="mapCenterProxy.latitude"
 			:include-points="state.markers" :markers="state.markers" :polyline="polyline" @markertap="onMarkerTap"
@@ -15,11 +15,11 @@
 	</view>
 	<scroll-view class="detail-panel" :style="{ height: '50%', width: '100%' }" v-show="showDetail">
 		<view>
-		  <picker mode="date" :value="beginDate" @change="onDateChange">
-		    <view class="picker">
-		      // 更改出行日期：{{ beginDate }}
-		    </view>
-		  </picker>
+			<picker mode="date" :value="beginDate" @change="onDateChange">
+				<view class="picker">
+					// 更改出行日期：{{ beginDate }}
+				</view>
+			</picker>
 		</view>
 		<view class="detail-content">
 			<text>id：{{current_location.id}}\n</text>
@@ -29,13 +29,37 @@
 			<!-- <text v-if="current_location.id >= 1&&route">距离：{{polyline.value[current_location.id-1][0].distance}}</text> -->
 			<!-- <text>距离：{{polyline[current_location.value.])}}</text> -->
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
-			<button class="addMarkerButton" @click="addMarker">添加</button>
+			<button class="addMarkerButton" @click="addMarkerToRoute">添加</button>
 			<button class="deleteMarkerButton" @click="deleteMarker">取消</button>
 			<button class="routePlanning" @click="planRoute">路径规划</button>
 			<!-- <button class="floating-button" @click="toggleDetailPanel">关闭</button> -->
 		</view>
 	</scroll-view>
-	
+	<view class="container">
+		<button @click="showModal">点击弹出弹窗</button>
+		<view class="modal" v-if="modalVisible">
+			<view class="modalPage">
+				<view class="picker-container">
+					<text>添加日程到第</text>
+					<picker mode="selector" :range="pickerRange" @change="onPickerChange1">
+						<view class="picker">{{ pickerValue1 }}</view>
+					</picker>
+					<text>天</text>
+				</view>
+				<view class="picker-container">
+					<text>当日第</text>
+					<picker mode="selector" :range="pickerRange" @change="onPickerChange2">
+						<view class="picker">{{ pickerValue2 }}</view>
+					</picker>
+					<text>个行程</text>
+				</view>
+				<view class="buttonDate">
+					<button class="cancelDate" @click="cancelDate">取消</button>
+					<button class="confirmDate" @click="confirmDate">确定</button>
+				</view>
+			</view>
+		</view>
+	</view>
 </template>
 
 
@@ -58,10 +82,49 @@
 		// 页面加载时执行的初始化操作
 		setupQQMap(qqmapsdk);
 	});
+
+	const modalVisible = ref(false);
+	const pickerRange = ref(Array.from({
+		length: 50
+	}, (_, index) => index + 1));
+	const pickerValue1 = ref('请选择');
+	const pickerValue2 = ref('请选择');
+	const addMarkerToRoute = () => {
+		showModal();
+		unshowDetailPanel();
+	}
+	const showModal = () => {
+		modalVisible.value = true;
+	};
+
+	const hideModal = () => {
+		modalVisible.value = false;
+	};
+
+	const onPickerChange1 = (e) => {
+		pickerValue1.value = pickerRange.value[e.detail.value];
+	};
+
+	const onPickerChange2 = (e) => {
+		pickerValue2.value = pickerRange.value[e.detail.value];
+	};
+
+	const confirmDate = () => {
+		hideModal();
+		addMarker();
+	}
+
+	const cancelDate = () => {
+		hideModal();
+		pickerValue1.value = '请选择';
+		pickerValue2.value = '请选择';
+	}
+
+
 	const beginDate = ref(new Date().toISOString().slice(0, 10)); // 使用ref创建响应式数据
-	
+
 	const onDateChange = (e) => {
-	  beginDate.value = e.detail.value; // 更新选择的日期
+		beginDate.value = e.detail.value; // 更新选择的日期
 	};
 	// 定义响应式状态
 	const state = reactive({
@@ -128,12 +191,12 @@
 		//如果第一次使用搜索，则存储当前的点
 		if (!onSearching.value) {
 			console.log(1);
-			console.log("brfore",markers_store);
-			for(let i=0;i<state.markers.length;i++){
+			console.log("brfore", markers_store);
+			for (let i = 0; i < state.markers.length; i++) {
 				markers_store.value.push(state.markers[i]);
 			}
 			// markers_store.value = state.markers;
-			console.log("store",markers_store);
+			console.log("store", markers_store);
 		}
 		console.log(2)
 		//将显示数组变为搜索的点
@@ -434,7 +497,7 @@
 		border-radius: 4px;
 	}
 
-	button {
+	.searchBarButton {
 		padding: 0rpx 10px;
 		font-size: 30rpx;
 		background-color: #007aff;
@@ -442,5 +505,72 @@
 		border: none;
 		border-radius: 10rpx;
 		margin-left: 10px;
+	}
+
+	.container {
+		padding: 20px;
+		background-color: black;
+	}
+
+	.modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.modalPage {
+		background-color: #fff;
+		width: 80%;
+		border-radius: 30rpx;
+	}
+
+	.picker-container {
+		margin: 20px;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.picker {
+		padding: 10rpx;
+		margin: 20rpx;
+		border-color: black;
+		border-width: 10rpx;
+		background-color: #f6ede5;
+		color: #2a82fe;
+		font-weight: 1000;
+		font-size: 45rpx;
+		border-radius: 10rpx;
+		text-align: center;
+	}
+
+	.buttonDate {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.confirmDate,
+	.cancelDate {
+		border-color: white;
+		border-width: 30rpx;
+		border-radius: 0 0 0 30rpx;
+		background-color: white;
+		width: 50%;
+		background-color: #f1f1f1;
+	}
+
+	.confirmDate {
+		background-color: #2a82fe;
+		border-radius: 0 0 30rpx 0;
+		color: white;
 	}
 </style>
