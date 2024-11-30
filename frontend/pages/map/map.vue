@@ -1,6 +1,6 @@
 <template>
 	<view class="full-screen">
-		<view class="search-page">
+		<view class="search-page" v-if="!modalVisible">
 			<input type="text" v-model="searchText" placeholder="请输入搜索内容" />
 			<button class="searchBarButton" @click="onSearch">搜索</button>
 			<button class="searchBarButton" @click="cancelSearch">取消</button>
@@ -13,8 +13,8 @@
 			@tap="onMapTap"-->
 		</map>
 	</view>
+	
 	<scroll-view class="detail-panel" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
-
 		<view class="detail-content">
 			<text class="dateDetail">第{{current_location.tourDate}}天 第{{current_location.tourOrder}}个行程</text>
 			<text>id：{{current_location.id}}\n</text>
@@ -38,7 +38,6 @@
 	</scroll-view>
 	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
 	<view class="container">
-		<button @click="showModal">点击弹出弹窗</button>
 		<view class="modal" v-if="modalVisible">
 			<view class="modalPage">
 				<view class="picker-container">
