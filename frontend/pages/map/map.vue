@@ -13,29 +13,30 @@
 			@tap="onMapTap"-->
 		</map>
 	</view>
-	<scroll-view class="detail-panel" :style="{ height: '50%', width: '100%' }" v-show="showDetail">
-		<view>
-			<picker mode="date" :value="beginDate" @change="onDateChange">
-				<view class="picker">
-					// 更改出行日期：{{ beginDate }}
-				</view>
-			</picker>
-		</view>
+	<scroll-view class="detail-panel" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
+
 		<view class="detail-content">
+			<text class="dateDetail">第{{current_location.tourDate}}天 第{{current_location.tourOrder}}个行程</text>
 			<text>id：{{current_location.id}}\n</text>
-			<text>地点名称：{{ current_location.standard_address}}\n</text>
-			<text>地点描述：{{ current_location.recommend}}附近\n</text>
-			<text>所在地区：{{current_location.district}}\n</text>
-			<text>第{{current_location.tourDate}}天的第{{current_location.tourOrder}}个行程</text>
+			<text class="locationStandard">{{ current_location.standard_address}}</text>
+			<text class="locationRecommend">{{current_location.district}} - {{ current_location.recommend}}附近</text>
 			<!-- <text v-if="current_location.id >= 1&&route">距离：{{polyline.value[current_location.id-1][0].distance}}</text> -->
 			<!-- <text>距离：{{polyline[current_location.value.])}}</text> -->
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
-			<button class="addMarkerButton" @click="addMarkerToRoute">添加</button>
-			<button class="deleteMarkerButton" @click="deleteMarker">取消</button>
-			<button class="routePlanning" @click="planRoute">路径规划</button>
+			<button class="unshowDetailPanel" @click="unshowDetailPanel">×</button>
 			<!-- <button class="floating-button" @click="toggleDetailPanel">关闭</button> -->
 		</view>
+		<view class="bottomBar">
+			<picker mode="date" :value="beginDate" @change="onDateChange">
+				<view class="pickerStartOff">
+					{{ beginDate }}出发
+				</view>
+			</picker>
+			<button class="deleteMarkerButton" @click="deleteMarker" v-show="!onSearching">移出行程</button>
+			<button class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
+		</view>
 	</scroll-view>
+	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
 	<view class="container">
 		<button @click="showModal">点击弹出弹窗</button>
 		<view class="modal" v-if="modalVisible">
@@ -127,8 +128,8 @@
 		// }
 		// return 0;
 		for (let i = state.markers.length - 2; i >= 0; i--) {
-			console.log("markerDate",state.markers[i].tourDate);
-			console.log("value1",pickerValue1.value);
+			console.log("markerDate", state.markers[i].tourDate);
+			console.log("value1", pickerValue1.value);
 			if (state.markers[i].tourDate == pickerValue1.value) {
 				return state.markers[i].tourOrder;
 			}
@@ -181,7 +182,38 @@
 	const confirmDate = () => {
 		hideModal();
 		addMarker();
+		updateAddedOrder();
+		updateId();
 		clearDateSelecter();
+	}
+	const findMarkerIndexByDate = (targetTourDate, targetTourOrder) => {
+		const index = state.markers.findIndex(marker =>
+			marker.tourDate === targetTourDate && marker.tourOrder === targetTourOrder
+		);
+		return index;
+	};
+	const updateAddedOrder = () => {
+		const index = findMarkerIndexByDate(state.markers[state.markers.length - 1].tourDate, state.markers[state
+			.markers.length - 1].tourOrder);
+		// 使用临时变量来交换属性值
+		const tmpMark = {
+			id: state.markers[state.markers.length - 1].id,
+			latitude: state.markers[state.markers.length - 1].latitude,
+			longitude: state.markers[state.markers.length - 1].longitude,
+			tourDate: state.markers[state.markers.length - 1].tourDate,
+			tourOrder: state.markers[state.markers.length - 1].tourOrder,
+		};
+		state.markers.splice(index, 0, tmpMark);
+		state.markers.pop();
+
+		for (let i = index + 1; i < state.markers.length; i++) {
+			if (state.markers[i].tourDate == state.markers[index].tourDate) {
+				state.markers[i].tourOrder++;
+			} else {
+				break;
+			}
+		}
+		//
 	}
 
 	const clearDateSelecter = () => {
@@ -371,10 +403,10 @@
 		unshowDetailPanel();
 	}
 
-	const updateId=()=>{
+	const updateId = () => {
 		state.markers.forEach((marker, index) => {
-		    marker.id = index;
-		  });
+			marker.id = index;
+		});
 	}
 	//
 	const findMarkerById = (markers, id) => {
@@ -522,6 +554,8 @@
 	}
 
 	.detail-content {
+		display: flex;
+		flex-direction: column;
 		padding: 15px;
 	}
 
@@ -550,6 +584,26 @@
 		/* 确保搜索栏在地图上方 */
 		z-index: 10;
 		border-radius: 20rpx;
+		/* 水平偏移 0px，垂直偏移 4px，模糊半径 10px，颜色为黑色，透明度为 0.3 */
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	.routePlanning {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		font-size: 30rpx;
+		line-height: 1.1;
+		width: 120rpx;
+		height: 120rpx;
+		padding: 20rpx;
+		color: white;
+		background-color: #007aff;
+		bottom: 5vh;
+		right: 50rpx;
+		/* 确保搜索栏在地图上方 */
+		z-index: 10;
+		border-radius: 50%;
 		/* 水平偏移 0px，垂直偏移 4px，模糊半径 10px，颜色为黑色，透明度为 0.3 */
 		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 	}
@@ -614,6 +668,17 @@
 		border-radius: 10rpx;
 		text-align: center;
 	}
+	.pickerStartOff{
+		padding: 10rpx;
+		border-color: black;
+		border-width: 10rpx;
+		background-color: #f6ede5;
+		color: #2a82fe;
+		font-weight: 1000;
+		font-size: 40rpx;
+		border-radius: 10rpx;
+		text-align: center;
+	}
 
 	.buttonDate {
 		display: flex;
@@ -636,5 +701,73 @@
 		background-color: #2a82fe;
 		border-radius: 0 0 30rpx 0;
 		color: white;
+	}
+
+	.dateDetail {
+		font-size: 50rpx;
+		font-weight: 1000;
+
+	}
+
+	.locationStandard {
+		font-size: 33rpx;
+		font-weight: 600;
+	}
+
+	.locationRecommend {
+		font-size: 25rpx;
+	}
+
+	.bottomBar {
+		display: flex;
+		flex-direction: row;
+		position: absolute;
+		bottom: 0;
+		/* border: 2px solid green; */
+		padding:10rpx;
+		width: 98%;
+		/* justify-content: stretch; */
+		align-items: center;
+	}
+
+	.addMarkerButton {
+		background-color: #007AFF;
+		color: white;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		border-radius: 60rpx;
+		font-weight: 400;
+		font-size: 27rpx;
+		width: 26%;
+		height: 80rpx;
+	}
+
+	.deleteMarkerButton {
+		border: 2px solid #007AFF;
+		color: #007AFF;
+		/* 2px宽的实线边框，颜色为黑色 */
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		border-radius: 60rpx;
+		font-weight: 400;
+		font-size: 27rpx;
+		width: 26%;
+		height: 80rpx;
+	}
+	.unshowDetailPanel{
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		position: absolute;
+		width: 30px;
+		height:30px;
+		top: 10px;
+		right:10px;
+		border-radius: 50%;
 	}
 </style>
