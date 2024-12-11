@@ -124,6 +124,8 @@
 						},
 						success: (res) => {
 							console.log('登录成功:', res.data);
+							getApp().globalData.openid=res.data.openid;
+							console.log(getApp().globalData.openid);
 							// 处理后端返回的登录信息
 
 						},

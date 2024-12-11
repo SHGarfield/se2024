@@ -3,4 +3,5 @@ from . import views
 
 urlpatterns = [
     path('login/', views.wechat_login, name='wechat_login'),
+    path('upload_avatar/', views.upload_avatar, name='upload_avatar'),
 ]
