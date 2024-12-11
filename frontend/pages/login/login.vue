@@ -53,90 +53,89 @@
 				this.avatarUrl = e.detail.avatarUrl;
 			},
 			
-			 uploadAvatar(filePath) {
-			      uni.uploadFile({
-			        url: "http://111.229.117.144:8000/login/upload_avatar/", // 替换为后端接口地址
-			        filePath, // 临时文件路径
-			        name: "avatar", // 后端接收文件的字段名
-			        formData: {
-			        },
-			        success: (uploadFileRes) => {
-			          console.log("上传成功", uploadFileRes);
-			          const response = JSON.parse(uploadFileRes.data);
-			          if (response.code === 200) {
-			            uni.showToast({
-			              title: "上传成功",
-			              icon: "success",
-			            });
-			          } else {
-			            uni.showToast({
-			              title: "上传失败",
-			              icon: "error",
-			            });
-			          }
-			        },
-			        fail: (error) => {
-			          console.error("上传失败", error);
+			// 上传头像
+			async uploadAvatar(filePath) {
+			  return new Promise((resolve, reject) => {
+			    uni.uploadFile({
+			      url: "http://111.229.117.144:8000/login/upload_avatar/",  // 确保 URL 是正确的
+			      filePath, // 临时文件路径
+			      name: "avatar", // 后端接收文件的字段名
+			      formData: {
+			        openid: getApp().globalData.openid,
+			      },
+			      success: (uploadFileRes) => {
+			        console.log("上传成功", uploadFileRes);
+			        const response = JSON.parse(uploadFileRes.data);
+			        if (response.code === 200) {
+			          uni.showToast({
+			            title: "上传成功",
+			            icon: "success",
+			          });
+			          resolve();
+			        } else {
 			          uni.showToast({
 			            title: "上传失败",
 			            icon: "error",
 			          });
-			        },
-			      });
-			    },
-			
-			
-			//获取用户信息
-
-			async getUserProfile() {
-				try {
-					const userProfile = await uni.getUserProfile({
-						desc: '用于完善用户资料', // 授权
-					});
-					console.log('用户信息:', userProfile);
-
-					// 将用户信息保存，并调用登录流程
-					this.wxLogin(userProfile.userInfo);
-					this.uploadAvatar(this.avatarUrl);
-				} catch (error) {
-					console.error('获取用户信息失败:', error);
-				}
+			          reject();
+			        }
+			      },
+			      fail: (error) => {
+			        console.error("上传失败", error);
+			        uni.showToast({
+			          title: "上传失败",
+			          icon: "error",
+			        });
+			        reject(error);
+			      },
+			    });
+			  });
 			},
-			//调用微信登录
+			
+			// 获取用户信息
+			async getUserProfile() {
+			  try {
+			    const userProfile = await uni.getUserProfile({
+			      desc: '用于完善用户资料', // 授权
+			    });
+			    console.log('用户信息:', userProfile);
+			
+			    // 将用户信息保存，并调用登录流程
+			    await this.wxLogin(userProfile.userInfo);
+			    await this.uploadAvatar(this.avatarUrl);
+			  } catch (error) {
+			    console.error('获取用户信息失败:', error);
+			  }
+			},
+			
+			// 调用微信登录
 			async wxLogin(userInfo) {
-				try {
-					// 获取微信登录的 code
-					const loginRes = await uni.login({
-						provider: 'weixin',
-					});
-					const {
-						code
-					} = loginRes;
-					console.log('微信登录 code:', code);
-
-					// 将 code 发送到后端
-					await uni.request({
-						url: 'http://111.229.117.144:8000/login/login/',
-						method: 'POST',
-						data: {
-							code: code,
-							nickname: userInfo.nickName,
-						},
-						success: (res) => {
-							console.log('登录成功:', res.data);
-							getApp().globalData.openid=res.data.openid;
-							console.log(getApp().globalData.openid);
-							// 处理后端返回的登录信息
-
-						},
-						fail: (err) => {
-							console.error('登录失败:', err);
-						},
-					});
-					uni.navigateBack();
-				} catch (error) {
-					console.error('微信登录失败:', error);
-				}
+			  try {
+			    // 获取微信登录的 code
+			    const loginRes = await uni.login({
+			      provider: 'weixin',
+			    });
+			    const {
+			      code
+			    } = loginRes;
+			    console.log('微信登录 code:', code);
+			
+			    // 将 code 发送到后端
+			    const requestRes = await uni.request({
+			      url: 'http://111.229.117.144:8000/login/login/', 
+			      method: 'POST',
+			      data: {
+			        code: code,
+			        nickname: userInfo.nickName,
+			      },
+			    });
+			    console.log('登录成功:', requestRes.data);
+			    getApp().globalData.openid = requestRes.data.openid;
+			    console.log(getApp().globalData.openid);
+			    // 处理后端返回的登录信息
+			  } catch (error) {
+			    console.error('微信登录失败:', error);
+			  }
 			},
 		},
 	};

@@ -59,7 +59,7 @@ def add_user_to_db(response_data,data):
 # from django.views.decorators.csrf import csrf_exempt
 import os
 
-UPLOAD_DIR = os.path.join(os.path.dirname(os.getcwd()), 'another', 'directory')
+UPLOAD_DIR = os.path.join(os.getcwd(), 'static', 'avatar')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # @csrf_exempt  # 如果在开发阶段跳过 CSRF 验证
@@ -73,5 +73,12 @@ def upload_avatar(request):
             for chunk in avatar.chunks():
                 destination.write(chunk)
         
+        #接受openid
+        openid = request.POST.dict().get('openid', None)
+        print("openid:",openid)
+        # 将文件路径保存到数据库
+        user = models.UserInfo.objects.filter(openid=openid).first()
+        user.avatar_url = file_path
+        print("user:",user)
         return JsonResponse({"code": 200, "message": "头像上传成功", "file_path": file_path})
     return JsonResponse({"code": 400, "message": "请求无效"}, status=400)
