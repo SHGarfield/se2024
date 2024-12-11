@@ -27,7 +27,7 @@ def wechat_login(request):
             print(f"openid:{response_data['openid']}(已存在)")
         else:
             print(f"openid:{response_data['openid']}(不存在)")
-            add_user_to_db(response_data)
+            add_user_to_db(response_data,data)
         if 'openid' in response_data:
             # 在这里处理登录逻辑，例如创建用户会话或返回用户信息
             return JsonResponse({'status': 'success', 'openid': response_data['openid']})
@@ -39,12 +39,18 @@ def wechat_login(request):
 def ifUserOpenIdExist(_openid):
     return models.UserInfo.objects.filter(openid=_openid).exists()
 
-def add_user_to_db(response_data):
-    openid = response_data['openid']
-    username = response_data['username']
-    email, gender= "未填写", 0
-    if 'email' in response_data:
-        email = response_data['email']
-    if 'gender' in response_data:
-        gender = response_data['gender']
-    models.UserInfo.objects.create(openid, username,email,gender)
+def add_user_to_db(response_data,data):
+    # openid = response_data['openid']
+    # username = data.get('nickname')
+    # email, gender= "未填写", "未填写"
+    # if 'email' in response_data:
+    #     email = response_data['email']
+    # if 'gender' in response_data:
+    #     gender = response_data['gender']
+    new_instance = models.UserInfo()
+    new_instance.openid = response_data['openid']
+    new_instance.username = data.get('nickname')
+    new_instance.email = "未填写"
+    new_instance.gender= "未填写"
+    new_instance.save()
+    print(models.UserInfo.objects.all().first())

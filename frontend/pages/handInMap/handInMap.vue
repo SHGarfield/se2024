@@ -33,7 +33,7 @@
 			url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 后端API地址
 			method: 'POST',
 			data: {
-				openid:"TODO",
+				openid:getApp().globalData.openid,
 				title: title.value,
 				content: content.value,
 				marks: getApp().globalData.markers // 这里需要页面A的数据传递机制

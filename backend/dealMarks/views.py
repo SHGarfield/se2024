@@ -35,7 +35,7 @@ def addMarks(request):
         for entry in all_entries:
             print(models.Marks.objects.all().values('id', 'title'))
             print(entry.openid, entry.title, entry.content, entry.marks, entry.modified_time)
-        
+        getMarks(request)
     return JsonResponse({'status': 'success'})
 
 def getMarks(request):

@@ -10,7 +10,8 @@
 			console.log('App Hide')
 		},
 		globalData: {
-		  markers: []
+		  markers: [],
+		  openid:"",
 		}
 	}
 </script>
