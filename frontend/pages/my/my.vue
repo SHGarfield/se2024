@@ -15,7 +15,7 @@
           </view>
         </view>
         <!-- 右侧设置按钮 -->
-        <view class="setting-box" @click="handleOption">
+        <view class="setting-box" @click="updateListData">
           <text class="setting-text">设置</text>
         </view>
       </view>
@@ -86,6 +86,27 @@ const listData = ref([
   { image: '/static/logo.png', title: '标题4' },
   { image: '/static/logo.png', title: '标题5' },
 ])
+// onShow(() => {
+// 		updateListData();
+// 	});
+const updateListData=()=>{
+	wx.request({
+		url: 'http://111.229.117.144:8000/dealMarks/getMarks/', // 后端API地址
+		method: 'POST',
+		data: {
+			openid:getApp().globalData.openid,
+		},
+		success: function(res) {
+			console.log('我的旅程更新res', res);
+			listData.value=res.data.data;
+			console.log("res.data:",res.data);
+			console.log("listData:",listData.value);
+		},
+		fail: function(err) {
+			console.error('数据提交失败', err);
+		}
+	});
+}
 </script>
 
 <style lang="scss">
