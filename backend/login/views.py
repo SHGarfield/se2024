@@ -59,7 +59,7 @@ def add_user_to_db(response_data,data):
 # from django.views.decorators.csrf import csrf_exempt
 import os
 
-UPLOAD_DIR = os.path.join(os.getcwd(), 'avatars')
+UPLOAD_DIR = os.path.join(os.path.dirname(os.getcwd()), 'another', 'directory')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # @csrf_exempt  # 如果在开发阶段跳过 CSRF 验证
