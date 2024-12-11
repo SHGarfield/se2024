@@ -1,54 +1,57 @@
 {
-	"pages": [
-		{
+	"pages": [{
 			"path": "pages/map/map",
 			"style": {
-				"navigationBarTitleText" : "首页"
+				"navigationBarTitleText": "首页"
 			}
 		},
 		{
 			"path": "pages/login/login",
 			"style": {
-				"navigationBarTitleText" : "登录"
+				"navigationBarTitleText": "登录"
 			}
 		},
 		{
-			"path" : "pages/find/find",
-			"style" : 
-			{
-				"navigationBarTitleText" : "发现"
+			"path": "pages/find/find",
+			"style": {
+				"navigationBarTitleText": "发现"
 			}
-	  },
-	  {
+		},
+		{
 			"path": "pages/my/my",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTextStyle": "white",
 				"navigationBarTitleText": "我的"
-		}
-	  },
-	  {
+			}
+		},
+		{
 			"path": "pages/userinfo/userinfo",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTextStyle": "white",
 				"navigationBarTitleText": "编辑资料"
 			}
-	  },
-	  {
+		},
+		{
 			"path": "pages/option/option",
 			"style": {
 				"navigationStyle": "custom",
 				"navigationBarTextStyle": "white",
 				"navigationBarTitleText": "设置"
 			}
-	  }
+		},
+		{
+			"path": "pages/handInMap/handInMap",
+			"style": {
+				"navigationBarTitleText": "编辑路线内容"
+			}
+		}
 	],
 	"tabBar": {
 		"color": "#666666",
 		"selectedColor": "#2a82fe",
-		"list": [
-			{
+		"list": [{
 				"pagePath": "pages/find/find",
 				"text": "发现",
 				"iconPath": "static/images/discover.jpg",
@@ -68,7 +71,7 @@
 			}
 		]
 	},
-	
+
 	"uniIdRouter": {},
 	"globalStyle": {
 		"navigationBarBackgroundColor": "#2a82fe"

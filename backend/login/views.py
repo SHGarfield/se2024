@@ -13,17 +13,17 @@ def wechat_login(request):
         data = json.loads(request.body)
         print(data)
         code = data.get('code')
-        nickname = data.get('nickname')
         print(code)
         appid = 'wxb5dbc4b4be36808f'
         secret = 'fff193612d5d2bea5e85689abe27e14a'
         url = f'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code'
+        
         #从微信服务器得到含openid的response
         response = requests.get(url)
         response_data=json.loads(response.text)
         print("response_data: ",response_data)
         #将openid存入数据库
-        if(search_db(response_data['openid']) == True):
+        if(ifUserOpenIdExist(response_data['openid']) == True):
             print(f"openid:{response_data['openid']}(已存在)")
         else:
             print(f"openid:{response_data['openid']}(不存在)")
@@ -36,7 +36,7 @@ def wechat_login(request):
     else:
         return JsonResponse({'status': 'fail', 'error': '仅支持POST请求'})
     
-def search_db(_openid):
+def ifUserOpenIdExist(_openid):
     return models.UserInfo.objects.filter(openid=_openid).exists()
 
 def add_user_to_db(response_data):

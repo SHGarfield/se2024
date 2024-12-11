@@ -13,7 +13,7 @@
 			@tap="onMapTap"-->
 		</map>
 	</view>
-	
+
 	<scroll-view class="detail-panel" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
 		<view class="detail-content">
 			<text class="dateDetail">第{{current_location.tourDate}}天 第{{current_location.tourOrder}}个行程</text>
@@ -37,6 +37,7 @@
 		</view>
 	</scroll-view>
 	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
+	<button class="saveRoute" @click="sendMarkersToServer">发送标记</button>
 	<view class="container">
 		<view class="modal" v-if="modalVisible">
 			<view class="modalPage">
@@ -112,6 +113,41 @@
 			}
 		}]
 	});
+	const sendMarkersToServer = async () => {
+		
+		wx.navigateTo({
+		  url: '/pages/handInMap/handInMap'
+		});
+		getApp().globalData.markers=state.markers;
+		console.log(getApp().globalData.markers);
+		// wx.request({
+		// 	url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 你的后端服务器地址
+		// 	method: 'POST',
+		// 	data: {
+		// 		openid:"openid",
+		// 		title:"title",
+		// 		content:"content",
+		// 		marks:state.markers,
+		// 	},
+		// 	header: {
+		// 		'content-type': 'application/json' // 设置请求的 header
+		// 	},
+		// 	success: function(res) {
+		// 		console.log("success")
+		// 	},
+		// 	fail: function(error) {
+		// 		console.log("error")
+		// 	}
+		// });
+	};
+
+
+	// 将markers和sendMarkersToServer方法暴露给模板
+	// return {
+	// 	markers,
+	// 	sendMarkersToServer,
+	// };
+
 	const isPicker2Available = ref(false);
 	const getAllDate = () => {
 		console.log("state markers(getAllDate)", state.markers);
@@ -587,6 +623,26 @@
 		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 	}
 
+	.saveRoute {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		font-size: 30rpx;
+		line-height: 1.1;
+		width: 120rpx;
+		height: 120rpx;
+		padding: 20rpx;
+		color: white;
+		background-color: #007aff;
+		bottom: 5vh;
+		left: 50rpx;
+		/* 确保搜索栏在地图上方 */
+		z-index: 10;
+		border-radius: 50%;
+		/* 水平偏移 0px，垂直偏移 4px，模糊半径 10px，颜色为黑色，透明度为 0.3 */
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+	}
+
 	.routePlanning {
 		position: absolute;
 		display: flex;
@@ -667,7 +723,8 @@
 		border-radius: 10rpx;
 		text-align: center;
 	}
-	.pickerStartOff{
+
+	.pickerStartOff {
 		padding: 10rpx;
 		border-color: black;
 		border-width: 10rpx;
@@ -723,7 +780,7 @@
 		position: absolute;
 		bottom: 0;
 		/* border: 2px solid green; */
-		padding:10rpx;
+		padding: 10rpx;
 		width: 98%;
 		/* justify-content: stretch; */
 		align-items: center;
@@ -757,16 +814,17 @@
 		width: 26%;
 		height: 80rpx;
 	}
-	.unshowDetailPanel{
+
+	.unshowDetailPanel {
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 		position: absolute;
 		width: 30px;
-		height:30px;
+		height: 30px;
 		top: 10px;
-		right:10px;
+		right: 10px;
 		border-radius: 50%;
 	}
 </style>
