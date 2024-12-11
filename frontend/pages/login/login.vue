@@ -71,6 +71,11 @@
 			            title: "上传成功",
 			            icon: "success",
 			          });
+					  setTimeout(function() {
+					      uni.navigateBack({
+					        delta: 1
+					      })
+					    }, 1000);
 			          resolve();
 			        } else {
 			          uni.showToast({
@@ -95,13 +100,8 @@
 			// 获取用户信息
 			async getUserProfile() {
 			  try {
-			    const userProfile = await uni.getUserProfile({
-			      desc: '用于完善用户资料', // 授权
-			    });
-			    console.log('用户信息:', userProfile);
-			
 			    // 将用户信息保存，并调用登录流程
-			    await this.wxLogin(userProfile.userInfo);
+			    await this.wxLogin();
 			    await this.uploadAvatar(this.avatarUrl);
 			  } catch (error) {
 			    console.error('获取用户信息失败:', error);
@@ -109,7 +109,7 @@
 			},
 			
 			// 调用微信登录
-			async wxLogin(userInfo) {
+			async wxLogin() {
 			  try {
 			    // 获取微信登录的 code
 			    const loginRes = await uni.login({
@@ -126,7 +126,7 @@
 			      method: 'POST',
 			      data: {
 			        code: code,
-			        nickname: userInfo.nickName,
+			        nickname: this.nickName,
 			      },
 			    });
 			    console.log('登录成功:', requestRes.data);

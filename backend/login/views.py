@@ -79,6 +79,9 @@ def upload_avatar(request):
         # 将文件路径保存到数据库
         user = models.UserInfo.objects.filter(openid=openid).first()
         user.avatar_url = file_path
-        print("user:",user)
+        
+        all_entries = models.UserInfo.objects.all()
+        for entry in all_entries:
+            print('--user',entry.openid, entry.username, entry.email, entry.gender, entry.avatar_url)
         return JsonResponse({"code": 200, "message": "头像上传成功", "file_path": file_path})
     return JsonResponse({"code": 400, "message": "请求无效"}, status=400)
