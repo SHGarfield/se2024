@@ -54,3 +54,24 @@ def add_user_to_db(response_data,data):
     new_instance.gender= "未填写"
     new_instance.save()
     print(models.UserInfo.objects.all().first())
+    
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+import os
+
+UPLOAD_DIR = os.path.join(os.getcwd(), 'avatars')
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# @csrf_exempt  # 如果在开发阶段跳过 CSRF 验证
+def upload_avatar(request):
+    if request.method == 'POST' and request.FILES.get('avatar'):
+        avatar = request.FILES['avatar']  # 获取上传的头像文件
+        file_path = os.path.join(UPLOAD_DIR, avatar.name)
+        
+        # 保存文件
+        with open(file_path, 'wb+') as destination:
+            for chunk in avatar.chunks():
+                destination.write(chunk)
+        
+        return JsonResponse({"code": 200, "message": "头像上传成功", "file_path": file_path})
+    return JsonResponse({"code": 400, "message": "请求无效"}, status=400)

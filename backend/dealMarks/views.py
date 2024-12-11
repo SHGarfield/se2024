@@ -48,7 +48,8 @@ def getMarks(request):
         matching_entries = models.Marks.objects.filter(openid=openid)
         
         # 将查询集转换为列表
-        entries_list = list(matching_entries.values('id', 'modified_time','title','content'))  # 根据需要选择字段
+        entries_list = list(matching_entries.values('id', 'modified_time','title','content','marks'))  # 根据需要选择字段
         print("entried_list:",entries_list)
         # 将列表作为JSON响应发送到请求端
         return JsonResponse({'data': entries_list}, safe=False)
+    
