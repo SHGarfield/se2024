@@ -52,6 +52,40 @@
 				//         });
 				this.avatarUrl = e.detail.avatarUrl;
 			},
+			
+			 uploadAvatar(filePath) {
+			      uni.uploadFile({
+			        url: "http://111.229.117.144:8000/login/upload_avatar/", // 替换为后端接口地址
+			        filePath, // 临时文件路径
+			        name: "avatar", // 后端接收文件的字段名
+			        formData: {
+			        },
+			        success: (uploadFileRes) => {
+			          console.log("上传成功", uploadFileRes);
+			          const response = JSON.parse(uploadFileRes.data);
+			          if (response.code === 200) {
+			            uni.showToast({
+			              title: "上传成功",
+			              icon: "success",
+			            });
+			          } else {
+			            uni.showToast({
+			              title: "上传失败",
+			              icon: "error",
+			            });
+			          }
+			        },
+			        fail: (error) => {
+			          console.error("上传失败", error);
+			          uni.showToast({
+			            title: "上传失败",
+			            icon: "error",
+			          });
+			        },
+			      });
+			    },
+			
+			
 			//获取用户信息
 
 			async getUserProfile() {
@@ -63,6 +97,7 @@
 
 					// 将用户信息保存，并调用登录流程
 					this.wxLogin(userProfile.userInfo);
+					this.uploadAvatar(this.avatarUrl);
 				} catch (error) {
 					console.error('获取用户信息失败:', error);
 				}
