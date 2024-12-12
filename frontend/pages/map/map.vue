@@ -75,6 +75,7 @@
 		toValue,
 		computed,
 	} from 'vue';
+	import { onShow } from '@dcloudio/uni-app';
 	import {
 		setupQQMap
 	} from '../../libs/functions/setupQQMap.js';
@@ -82,11 +83,7 @@
 		locationInfo
 	} from '../../libs/functions/locationInfo.js';
 	const qqmapsdk = ref(null);
-	// 定义生命周期钩子
-	onMounted(() => {
-		// 页面加载时执行的初始化操作
-		setupQQMap(qqmapsdk);
-	});
+	
 	// 定义响应式状态
 	const state = reactive({
 		marker_added: false,
@@ -113,6 +110,14 @@
 			}
 		}]
 	});
+	// 定义生命周期钩子
+	onMounted(() => {
+		// 页面加载时执行的初始化操作
+		setupQQMap(qqmapsdk);
+	});
+	onShow(()=>{
+		state.markers=getApp().globalData.marks;
+	})
 	const sendMarkersToServer = async () => {
 		
 		wx.navigateTo({

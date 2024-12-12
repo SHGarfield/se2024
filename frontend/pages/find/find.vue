@@ -3,11 +3,13 @@
 		<text class="section-title" @click="updateListData">我的计划</text>
 		<scroll-view class="scroll-list" scroll-y>
 			<view class="list-content">
-				<view class="item-card" v-for="(item, index) in listData" :key="index" @click="handlePlan">
+				<view class="item-card" v-for="(item, index) in listData" :key="index"
+					@click="() => handlePlan(item.marks)">
 					<text class="item-title">{{item.title}}</text>
 					<text class="item-content">{{item.content}}</text>
 					<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
-					<map class="item-map" :markers="item.marks" :include-points="item.marks" style="pointer-events: none;"></map>
+					<map class="item-map" :markers="item.marks" :include-points="item.marks"
+						style="pointer-events: none;"></map>
 				</view>
 			</view>
 		</scroll-view>
@@ -16,7 +18,8 @@
 
 <script setup>
 	import {
-		ref
+		ref,
+		onShow
 	} from 'vue'
 
 	const listData = ref([{
@@ -41,6 +44,13 @@
 			title: '标题5'
 		},
 	])
+	const handlePlan = (markers) => {
+		getApp().globalData.marks = markers;
+		console.log(markers);
+		wx.switchTab({
+			url: '/pages/map/map' // 替换为实际的目标页面路径
+		});
+	}
 	// onShow(() => {
 	// 		updateListData();
 	// 	});
@@ -113,7 +123,8 @@
 		font-size: 40rpx;
 		font-weight: 800;
 	}
-	.item-content{
+
+	.item-content {
 		padding: 0 20rpx;
 		font-size: 35rpx;
 		/* font-weight: 800; */
