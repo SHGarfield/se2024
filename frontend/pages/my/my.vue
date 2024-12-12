@@ -79,13 +79,7 @@ function handlePlan(){
   	url: '/pages/find/find'
   })
 }
-const listData = ref([
-  { image: '/static/logo.png', title: '标题1' },
-  { image: '/static/logo.png', title: '标题2' },
-  { image: '/static/logo.png', title: '标题3' },
-  { image: '/static/logo.png', title: '标题4' },
-  { image: '/static/logo.png', title: '标题5' },
-])
+const listData = ref([])
 // onShow(() => {
 // 		updateListData();
 // 	});
