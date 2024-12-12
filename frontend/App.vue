@@ -12,6 +12,7 @@
 		globalData: {
 		  markers: [],
 		  openid:"",
+		  avatar_url:"",
 		}
 	}
 </script>

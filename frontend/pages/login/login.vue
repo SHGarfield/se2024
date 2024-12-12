@@ -9,7 +9,7 @@
 			<text>昵称：</text>
 			<input class="inputNick" v-model="nickName" placeholder="请输入昵称" />
 		</view>
-		<button class="login-button" @click="getUserProfile">登录</button>
+		<button class="login-button" @click="login">登录</button>
 	</view>
 </template>
 
@@ -98,11 +98,13 @@
 			},
 			
 			// 获取用户信息
-			async getUserProfile() {
+			async login() {
 			  try {
 			    // 将用户信息保存，并调用登录流程
 			    await this.wxLogin();
 			    await this.uploadAvatar(this.avatarUrl);
+				getApp().globalData.avatar_url=this.avatarUrl;
+				console.log("getapp.aavatar:",getApp().globalData.avatar_url);
 			  } catch (error) {
 			    console.error('获取用户信息失败:', error);
 			  }

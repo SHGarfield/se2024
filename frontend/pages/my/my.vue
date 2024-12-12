@@ -1,11 +1,11 @@
 <template>
 	<view class="my">
 		<!-- 未登录状态 -->
-		<view class="user-card" v-if=!isLogin.value>
+		<view class="user-card" v-if="!isLogin">
 			<view class="user-info">
 				<!-- 左侧头像 -->
 				<view class="avatar-box">
-					<image class="avatar" src="/static/logo.png" mode="aspectFill"></image>
+					<image class="avatar" :src="avatar_url" mode="aspectFill"></image>
 				</view>
 				<!-- 中间信息列 -->
 				<view class="info-column">
@@ -26,7 +26,7 @@
 			<view class="user-info">
 				<!-- 左侧头像 -->
 				<view class="avatar-box">
-					<image class="avatar" src="/static/logo.png" mode="aspectFill"></image>
+					<image class="avatar" :src="avatar_url" mode="aspectFill"></image>
 				</view>
 				<!-- 中间信息列 -->
 				<view class="info-column">
@@ -68,6 +68,8 @@
 		onShow
 	} from '@dcloudio/uni-app';
 	const isRefreshing = ref(false);
+	const avatar_url = ref("../../static/un_login.jpg");
+	const isLogin = ref(false); // 自动暴露给模板使用
 	const listData = ref([{
 			image: '/static/logo.png',
 			title: '标题1'
@@ -99,6 +101,10 @@
 	// }
 	onShow(() => {
 		updateListData();
+		if(getApp().globalData.avatar_url){
+			avatar_url.value=getApp().globalData.avatar_url;
+			isLogin.value=true;
+		}
 	});
 	const handleRefresh = () => {
 		isRefreshing.value = true;
@@ -129,7 +135,6 @@
 			}
 		});
 	}
-	const isLogin = ref(false) // 自动暴露给模板使用
 	function handleEdit() {
 		uni.navigateTo({
 			url: '/pages/userinfo/userinfo'
