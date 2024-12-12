@@ -1,7 +1,7 @@
 <template>
 	<view class="list-section">
 		<text class="section-title" @click="updateListData">我的计划</text>
-		<scroll-view class="scroll-list" scroll-y>
+		<scroll-view class="scroll-list" scroll-y :refresher-enabled="true" @refresherrefresh="handleRefresh"  :refresher-triggered="isRefreshing">
 			<view class="list-content">
 				<view class="item-card" v-for="(item, index) in listData" :key="index"
 					@click="() => handlePlan(item.marks)">
@@ -21,7 +21,7 @@
 		ref,
 		onShow
 	} from 'vue'
-
+	const isRefreshing = ref(false);
 	const listData = ref([{
 			image: '/static/logo.png',
 			title: '标题1'
@@ -54,6 +54,10 @@
 	// onShow(() => {
 	// 		updateListData();
 	// 	});
+	const handleRefresh=()=>{
+		isRefreshing.value=true;
+		updateListData();
+	}
 	const updateListData = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/getAllMarks/', // 后端API地址
@@ -66,9 +70,16 @@
 				listData.value = res.data.data;
 				console.log("res.data:", res.data);
 				console.log("listData:", listData.value);
+				isRefreshing.value=false;
 			},
 			fail: function(err) {
 				console.error('数据提交失败', err);
+				wx.showToast({
+				  title: '数据提交失败', // 提示内容
+				  icon: 'error', // 图标类型
+				  duration: 1000 // 提示框停留时间
+				});
+				isRefreshing.value=false;
 			}
 		});
 	}
