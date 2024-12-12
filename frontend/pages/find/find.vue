@@ -18,9 +18,9 @@
 
 <script setup>
 	import {
-		ref,
-		onShow
+		ref
 	} from 'vue'
+	import { onShow } from '@dcloudio/uni-app';
 	const isRefreshing = ref(false);
 	const listData = ref([{
 			image: '/static/logo.png',
@@ -51,9 +51,9 @@
 			url: '/pages/map/map' // 替换为实际的目标页面路径
 		});
 	}
-	// onShow(() => {
-	// 		updateListData();
-	// 	});
+	onShow(() => {
+			updateListData();
+		});
 	const handleRefresh=()=>{
 		isRefreshing.value=true;
 		updateListData();
