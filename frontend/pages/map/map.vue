@@ -75,7 +75,7 @@
 		toValue,
 		computed,
 	} from 'vue';
-	import { onShow } from '@dcloudio/uni-app';
+	import { onShow,onHide } from '@dcloudio/uni-app';
 	import {
 		setupQQMap
 	} from '../../libs/functions/setupQQMap.js';
@@ -118,7 +118,7 @@
 	onShow(()=>{
 		state.markers=getApp().globalData.marks;
 	})
-	onunShow(()=>{
+	onHide(()=>{
 		getApp().globalData.marks=state.markers;
 	})
 	const sendMarkersToServer = async () => {
