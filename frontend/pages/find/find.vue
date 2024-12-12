@@ -6,7 +6,8 @@
 				<view class="item-card" v-for="(item, index) in listData" :key="index" @click="handlePlan">
 					<text class="item-title">{{item.title}}</text>
 					<text class="item-content">{{item.content}}</text>
-					<image class="item-image" :src="item.image" mode="aspectFill"></image>
+					<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
+					<map class="item-map" :markers="item.marks" :include-points="item.marks" style="pointer-events: none;"></map>
 				</view>
 			</view>
 		</scroll-view>
@@ -101,10 +102,10 @@
 		flex-direction: column;
 	}
 
-	.item-image {
+	.item-map {
 		width: 100%;
 		height: 300rpx;
-		border-radius: 30rpx;
+		border-radius: 0 30rpx 0 50rpx;
 	}
 
 	.item-title {
