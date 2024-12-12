@@ -4,8 +4,9 @@
 		<scroll-view class="scroll-list" scroll-y>
 			<view class="list-content">
 				<view class="item-card" v-for="(item, index) in listData" :key="index" @click="handlePlan">
-					<image class="item-image" :src="item.image" mode="aspectFill"></image>
 					<text class="item-title">{{item.title}}</text>
+					<text class="item-content">{{item.content}}</text>
+					<image class="item-image" :src="item.image" mode="aspectFill"></image>
 				</view>
 			</view>
 		</scroll-view>
@@ -13,85 +14,107 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+	import {
+		ref
+	} from 'vue'
 
-const listData = ref([{ image: '/static/logo.png', title: '标题1' },
-  { image: '/static/logo.png', title: '标题2' },
-  { image: '/static/logo.png', title: '标题3' },
-  { image: '/static/logo.png', title: '标题4' },
-  { image: '/static/logo.png', title: '标题5' },
-])
-// onShow(() => {
-// 		updateListData();
-// 	});
-const updateListData=()=>{
-	wx.request({
-		url: 'http://111.229.117.144:8000/dealMarks/getMarks/', // 后端API地址
-		method: 'POST',
-		data: {
-			openid:getApp().globalData.openid,
+	const listData = ref([{
+			image: '/static/logo.png',
+			title: '标题1'
 		},
-		success: function(res) {
-			console.log('我的旅程更新res', res);
-			listData.value=res.data.data;
-			console.log("res.data:",res.data);
-			console.log("listData:",listData.value);
+		{
+			image: '/static/logo.png',
+			title: '标题2',
+			content: "这里是中文内容谭工后方弄i给i哦能够对弄i给我答复农人辜负你的哦个肉共哦代购哦i工具都是给弄"
 		},
-		fail: function(err) {
-			console.error('数据提交失败', err);
-		}
-	});
-}
+		{
+			image: '/static/logo.png',
+			title: '标题3'
+		},
+		{
+			image: '/static/logo.png',
+			title: '标题4'
+		},
+		{
+			image: '/static/logo.png',
+			title: '标题5'
+		},
+	])
+	// onShow(() => {
+	// 		updateListData();
+	// 	});
+	const updateListData = () => {
+		wx.request({
+			url: 'http://111.229.117.144:8000/dealMarks/getAllMarks/', // 后端API地址
+			method: 'POST',
+			data: {
+				openid: getApp().globalData.openid,
+			},
+			success: function(res) {
+				console.log('我的旅程更新res', res);
+				listData.value = res.data.data;
+				console.log("res.data:", res.data);
+				console.log("listData:", listData.value);
+			},
+			fail: function(err) {
+				console.error('数据提交失败', err);
+			}
+		});
+	}
 </script>
 
 <style scss>
-	/* .list-section {
+	.list-section {
 		position: relative;
-		padding-top: 60rpx; // 为标题留出空间
-	
-		.section-title {
-			position: absolute;
-			top: 20rpx;
-			left: 30rpx;
-			font-size: 32rpx;
-			color: #333;
-			font-weight: 500;
-		}
-	
-		.scroll-list {
-			height: calc(75vh - 120rpx); // 减去用户卡片的高度、tabbar高度和间距
-			margin-top: 20rpx;
-			background-color: #f5f5f5;
-			min-height: 100vh;
-	
-			.list-content {
-				padding: 0 20rpx;
-				display: flex;
-				flex-direction: column;
-				gap: 20rpx;
-	
-				.item-card {
-					background-color: #ffffff;
-					border-radius: 12rpx;
-					padding: 20rpx;
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-	
-					.item-image {
-						width: 100%;
-						height: 300rpx;
-						border-radius: 8rpx;
-					}
-	
-					.item-title {
-						margin-top: 16rpx;
-						font-size: 28rpx;
-						color: #333;
-					}
-				}
-			}
-		}
+		padding-top: 60rpx;
+		/* 为标题留出空间 */
 	}
-	 */
+
+	.section-title {
+		position: absolute;
+		top: 20rpx;
+		left: 30rpx;
+		font-size: 32rpx;
+		color: #333;
+		font-weight: 500;
+	}
+
+	.list-content {
+		padding: 0 20rpx;
+		display: flex;
+		flex-direction: column;
+		gap: 20rpx;
+	}
+
+	.scroll-list {
+		height: calc(75vh - 120rpx);
+		/* 减去用户卡片的高度、tabbar高度和间距 */
+		margin-top: 20rpx;
+		background-color: #f5f5f5;
+		min-height: 100vh;
+	}
+
+	.item-card {
+		background-color: #ffffff;
+		border-radius: 30rpx;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.item-image {
+		width: 100%;
+		height: 300rpx;
+		border-radius: 30rpx;
+	}
+
+	.item-title {
+		padding: 20rpx 20rpx 5rpx 20rpx;
+		font-size: 40rpx;
+		font-weight: 800;
+	}
+	.item-content{
+		padding: 0 20rpx;
+		font-size: 35rpx;
+		/* font-weight: 800; */
+	}
 </style>
