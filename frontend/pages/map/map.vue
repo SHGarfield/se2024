@@ -118,6 +118,9 @@
 	onShow(()=>{
 		state.markers=getApp().globalData.marks;
 	})
+	onunShow(()=>{
+		getApp().globalData.marks=state.markers;
+	})
 	const sendMarkersToServer = async () => {
 		
 		wx.navigateTo({
