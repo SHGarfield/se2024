@@ -116,7 +116,9 @@
 		setupQQMap(qqmapsdk);
 	});
 	onShow(()=>{
-		state.markers=getApp().globalData.marks;
+		if(getApp().globalData.marks){
+		state.markers = getApp().globalData.marks;}
+		console.log("statet.marke4s:",state.markers)
 	})
 	onHide(()=>{
 		getApp().globalData.marks=state.markers;
