@@ -34,26 +34,13 @@
 			};
 		},
 		methods: {
-
+			//选择头像
 			onChooseAvatar(e) {
 				console.log(e.detail);
-				// wx.saveFile({
-				//             tempFilePath: e.detail,
-				//             success: function(saveRes) {
-				//                 const savedFilePath = saveRes.savedFilePath;
-				//                 // 将 savedFilePath 设置为图片的 src
-				//                 this.setData({
-				//                     avatarUrl: savedFilePath,
-				//                 });
-				//             },
-				//             fail: (err) => {
-				//                 console.error('保存文件失败', err);
-				//             }
-				//         });
 				this.avatarUrl = e.detail.avatarUrl;
 			},
 			
-			// 上传头像
+			// 上传头像（点击登陆后调用）
 			async uploadAvatar(filePath) {
 			  return new Promise((resolve, reject) => {
 			    uni.uploadFile({
@@ -97,7 +84,7 @@
 			  });
 			},
 			
-			// 获取用户信息
+			// 点击登录按钮
 			async login() {
 			  try {
 			    // 将用户信息保存，并调用登录流程
@@ -121,7 +108,7 @@
 			      code
 			    } = loginRes;
 			    console.log('微信登录 code:', code);
-			
+				getApp().globalData.username=this.nickName;
 			    // 将 code 发送到后端
 			    const requestRes = await uni.request({
 			      url: 'http://111.229.117.144:8000/login/login/', 

@@ -30,7 +30,7 @@
 				</view>
 				<!-- 中间信息列 -->
 				<view class="info-column">
-					<text class="username">用户名称</text>
+					<text class="username">{{nickname}}</text>
 					<view class="sub-info" @click="handleEdit">
 						<text class="sub-text">修改个人信息</text>
 					</view>
@@ -69,6 +69,7 @@
 	} from '@dcloudio/uni-app';
 	const isRefreshing = ref(false);
 	const avatar_url = ref("../../static/un_login.jpg");
+	const nickname = ref("");
 	const isLogin = ref(false); // 自动暴露给模板使用
 	const listData = ref([{
 			image: '/static/logo.png',
@@ -101,13 +102,16 @@
 	// }
 	onShow(() => {
 		updateListData();
+		console.log("globalavatar(onshow)",getApp().globalData.avatar_url);
 		if(getApp().globalData.avatar_url){
 			avatar_url.value=getApp().globalData.avatar_url;
+			nickname.value=getApp().globalData.nickname;
 			isLogin.value=true;
 		}
 	});
 	const handleRefresh = () => {
 		isRefreshing.value = true;
+		console.log("openid:",getApp().globalData.openid);
 		updateListData();
 	}
 	const updateListData = () => {
