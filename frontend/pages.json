@@ -46,6 +46,12 @@
 			"style": {
 				"navigationBarTitleText": "编辑路线内容"
 			}
+		},
+		{
+			"path": "pages/find_detail/find_detail",
+			"style": {
+				"navigationBarTitleText": "查看路线帖子"
+			}
 		}
 	],
 	"tabBar": {

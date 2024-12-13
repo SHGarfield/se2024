@@ -47,8 +47,11 @@
 	const handlePlan = (markers) => {
 		getApp().globalData.marks = markers;
 		console.log(markers);
-		wx.switchTab({
-			url: '/pages/map/map' // 替换为实际的目标页面路径
+		// wx.switchTab({
+		// 	url: '/pages/map/map' // 替换为实际的目标页面路径
+		// });
+		wx.navigateTo({
+			url:'/pages/find_detail/find_detail'
 		});
 	}
 	onShow(() => {

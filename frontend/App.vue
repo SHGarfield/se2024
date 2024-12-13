@@ -13,6 +13,7 @@
 		  markers: [],
 		  openid:"",
 		  avatar_url:"",
+		  username:"",
 		}
 	}
 </script>
