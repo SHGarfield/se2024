@@ -4,7 +4,7 @@
 		<scroll-view class="scroll-list" scroll-y :refresher-enabled="true" @refresherrefresh="handleRefresh"  :refresher-triggered="isRefreshing">
 			<view class="list-content">
 				<view class="item-card" v-for="(item, index) in listData" :key="index"
-					@click="() => handlePlan(item.marks)">
+					@click="() => handlePlan(item)">
 					<text class="item-title">{{item.title}}</text>
 					<text class="item-content">{{item.content}}</text>
 					<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
@@ -44,12 +44,9 @@
 			title: '标题5'
 		},
 	])
-	const handlePlan = (markers) => {
-		getApp().globalData.marks = markers;
-		console.log(markers);
-		// wx.switchTab({
-		// 	url: '/pages/map/map' // 替换为实际的目标页面路径
-		// });
+	const handlePlan = (itemData) => {
+		getApp().globalData.itemData = itemData;
+		console.log("itemData",itemData);
 		wx.navigateTo({
 			url:'/pages/find_detail/find_detail'
 		});

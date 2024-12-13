@@ -14,6 +14,7 @@
 		  openid:"",
 		  avatar_url:"",
 		  username:"",
+		  itemData:{},
 		}
 	}
 </script>
