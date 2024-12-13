@@ -39,93 +39,91 @@
 				console.log(e.detail);
 				this.avatarUrl = e.detail.avatarUrl;
 			},
-			
+
 			// 上传头像（点击登陆后调用）
 			async uploadAvatar(filePath) {
-			  return new Promise((resolve, reject) => {
-			    uni.uploadFile({
-			      url: "http://111.229.117.144:8000/login/upload_avatar/",  // 确保 URL 是正确的
-			      filePath, // 临时文件路径
-			      name: "avatar", // 后端接收文件的字段名
-			      formData: {
-			        openid: getApp().globalData.openid,
-			      },
-			      success: (uploadFileRes) => {
-			        console.log("上传成功", uploadFileRes);
-			        const response = JSON.parse(uploadFileRes.data);
-			        if (response.code === 200) {
-			          uni.showToast({
-			            title: "上传成功",
-			            icon: "success",
-			          });
-					  setTimeout(function() {
-					      uni.navigateBack({
-					        delta: 1
-					      })
-					    }, 1000);
-			          resolve();
-			        } else {
-			          uni.showToast({
-			            title: "上传失败",
-			            icon: "error",
-			          });
-			          reject();
-			        }
-			      },
-			      fail: (error) => {
-			        console.error("上传失败", error);
-			        uni.showToast({
-			          title: "上传失败",
-			          icon: "error",
-			        });
-			        reject(error);
-			      },
-			    });
-			  });
+				return new Promise((resolve, reject) => {
+					uni.uploadFile({
+						url: "http://111.229.117.144:8000/login/upload_avatar/", // 确保 URL 是正确的
+						filePath, // 临时文件路径
+						name: "avatar", // 后端接收文件的字段名
+						formData: {
+							openid: getApp().globalData.openid,
+						},
+						success: (uploadFileRes) => {
+							console.log("上传成功", uploadFileRes);
+							const response = JSON.parse(uploadFileRes.data);
+							if (response.code === 200) {
+								uni.showToast({
+									title: "上传成功",
+									icon: "success",
+								});
+								setTimeout(function() {
+									uni.navigateBack({
+										delta: 1
+									})
+								}, 1000);
+								resolve();
+							} else {
+								uni.showToast({
+									title: "上传失败",
+									icon: "error",
+								});
+								reject();
+							}
+						},
+						fail: (error) => {
+							console.error("上传失败", error);
+							uni.showToast({
+								title: "上传失败",
+								icon: "error",
+							});
+							reject(error);
+						},
+					});
+				});
 			},
-			
+
+
+			async uploadUsername(nickname) {
+				console.log('nickname:', nickname);
+				wx.request({
+					url: 'http://111.229.117.144:8000/login/upload_username/', // 后端API地址
+					method: 'POST',
+					data: {
+						openid: getApp().globalData.openid,
+						nickname: nickname,
+					},
+					success: function(res) {
+						console.log('nickname成功:', res);
+						getApp().globalData.nickName=this.nickname;
+					},
+					fail: function(err) {
+						console.error('nickname失败', err);
+					}
+				});
+			},
 			// 点击登录按钮
 			async login() {
-			  try {
-			    // 将用户信息保存，并调用登录流程
-			    await this.wxLogin();
-			    await this.uploadAvatar(this.avatarUrl);
-				getApp().globalData.avatar_url=this.avatarUrl;
-				console.log("getapp.aavatar:",getApp().globalData.avatar_url);
-			  } catch (error) {
-			    console.error('获取用户信息失败:', error);
-			  }
+				try {
+					// 将用户信息保存，并调用登录流程
+					// await this.wxLogin();
+					if (this.avatarUrl === '../../static/un_login.jpg' || this.nickName === '') {
+						wx.showToast({
+							title: '缺少头像或昵称', // 提示内容
+							icon: 'error', // 图标类型
+							duration: 1500 // 提示框停留时间
+						});
+					} else {
+						await this.uploadUsername(this.nickName);
+						await this.uploadAvatar(this.avatarUrl);
+						getApp().globalData.avatar_url = this.avatarUrl;
+						console.log("getapp.aavatar:", getApp().globalData.avatar_url);
+					}
+				} catch (error) {
+					console.error('获取用户信息失败:', error);
+				}
 			},
-			
-			// 调用微信登录
-			// async wxLogin() {
-			//   try {
-			//     // 获取微信登录的 code
-			//     const loginRes = await uni.login({
-			//       provider: 'weixin',
-			//     });
-			//     const {
-			//       code
-			//     } = loginRes;
-			//     console.log('微信登录 code:', code);
-			// 	getApp().globalData.username=this.nickName;
-			//     // 将 code 发送到后端
-			//     const requestRes = await uni.request({
-			//       url: 'http://111.229.117.144:8000/login/login/', 
-			//       method: 'POST',
-			//       data: {
-			//         code: code,
-			//         nickname: this.nickName,
-			//       },
-			//     });
-			//     console.log('登录成功:', requestRes.data);
-			//     getApp().globalData.openid = requestRes.data.openid;
-			//     console.log(getApp().globalData.openid);
-			//     // 处理后端返回的登录信息
-			//   } catch (error) {
-			//     console.error('微信登录失败:', error);
-			//   }
-			// },
 		},
 	};
 </script>

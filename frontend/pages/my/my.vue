@@ -106,7 +106,7 @@
 		console.log("globalavatar(onshow)",getApp().globalData.avatar_url);
 		if(getApp().globalData.avatar_url){
 			avatar_url.value=getApp().globalData.avatar_url;
-			nickname.value=getApp().globalData.nickname;
+			nickname.value=getApp().globalData.username;
 			isLogin.value=true;
 		}
 	});
