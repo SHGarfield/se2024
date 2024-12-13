@@ -101,6 +101,7 @@
 	// 	});
 	// }
 	onShow(() => {
+		isLogin.value=getApp().globalData.isLogin;
 		updateListData();
 		console.log("globalavatar(onshow)",getApp().globalData.avatar_url);
 		if(getApp().globalData.avatar_url){

@@ -29,7 +29,7 @@
 	export default {
 		data() {
 			return {
-				avatarUrl: '',
+				avatarUrl: '../../static/un_login.jpg',
 				nickName: ''
 			};
 		},
@@ -98,34 +98,34 @@
 			},
 			
 			// 调用微信登录
-			async wxLogin() {
-			  try {
-			    // 获取微信登录的 code
-			    const loginRes = await uni.login({
-			      provider: 'weixin',
-			    });
-			    const {
-			      code
-			    } = loginRes;
-			    console.log('微信登录 code:', code);
-				getApp().globalData.username=this.nickName;
-			    // 将 code 发送到后端
-			    const requestRes = await uni.request({
-			      url: 'http://111.229.117.144:8000/login/login/', 
-			      method: 'POST',
-			      data: {
-			        code: code,
-			        nickname: this.nickName,
-			      },
-			    });
-			    console.log('登录成功:', requestRes.data);
-			    getApp().globalData.openid = requestRes.data.openid;
-			    console.log(getApp().globalData.openid);
-			    // 处理后端返回的登录信息
-			  } catch (error) {
-			    console.error('微信登录失败:', error);
-			  }
-			},
+			// async wxLogin() {
+			//   try {
+			//     // 获取微信登录的 code
+			//     const loginRes = await uni.login({
+			//       provider: 'weixin',
+			//     });
+			//     const {
+			//       code
+			//     } = loginRes;
+			//     console.log('微信登录 code:', code);
+			// 	getApp().globalData.username=this.nickName;
+			//     // 将 code 发送到后端
+			//     const requestRes = await uni.request({
+			//       url: 'http://111.229.117.144:8000/login/login/', 
+			//       method: 'POST',
+			//       data: {
+			//         code: code,
+			//         nickname: this.nickName,
+			//       },
+			//     });
+			//     console.log('登录成功:', requestRes.data);
+			//     getApp().globalData.openid = requestRes.data.openid;
+			//     console.log(getApp().globalData.openid);
+			//     // 处理后端返回的登录信息
+			//   } catch (error) {
+			//     console.error('微信登录失败:', error);
+			//   }
+			// },
 		},
 	};
 </script>
