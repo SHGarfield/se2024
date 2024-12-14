@@ -96,7 +96,7 @@
 					},
 					success: function(res) {
 						console.log('nickname成功:', res);
-						getApp().globalData.nickName=this.nickname;
+						getApp().globalData.username=nickname;
 					},
 					fail: function(err) {
 						console.error('nickname失败', err);
