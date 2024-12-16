@@ -87,7 +87,7 @@ def upload_avatar(request):
         with open(file_path, "wb+") as destination:
             for chunk in avatar.chunks():
                 destination.write(chunk)
-
+        print("file_path:", file_path)
         # 接受openid
         openid = request.POST.dict().get("openid", None)
         print("openid:", openid)

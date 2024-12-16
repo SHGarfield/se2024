@@ -2,7 +2,8 @@
 	<view class="view-container">
 	    <input type="text" class="input-text title-input" placeholder="输入标题" maxlength="30" @input="titleChange" />
 	    <textarea class="textarea-content" placeholder="输入内容" maxlength=200 @input="contentChange"></textarea>
-	    <button class="submit-button" @click="submitData">提交</button>
+	    <button class="submit-button" @click="publish_route">发布</button>
+		<button class="submit-button" @click="save_private_route">保存到路线草稿</button>
 	</view>
 </template>
 
@@ -21,6 +22,7 @@
 	// 页面B的js文件
 	const title = ref('');
 	const content = ref('');
+	const isprivate=ref(true);
 
 	const titleChange = (e) => {
 		title.value = e.detail.value
@@ -28,6 +30,15 @@
 	const contentChange = (e) => {
 		content.value = e.detail.value;
 	};
+	const save_private_route=()=>{
+		isprivate.value=true;
+		submitData();
+	}
+	
+	const publish_route=()=>{
+		isprivate.value=false;
+		submitData();
+	}
 	const submitData = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 后端API地址
@@ -36,7 +47,8 @@
 				openid:getApp().globalData.openid,
 				title: title.value,
 				content: content.value,
-				marks: getApp().globalData.markers // 这里需要页面A的数据传递机制
+				marks: getApp().globalData.markers, // 这里需要页面A的数据传递机制
+				isprivate: isprivate.value
 			},
 			success: function(res) {
 				console.log('数据提交成功', res);

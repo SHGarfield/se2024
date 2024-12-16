@@ -43,7 +43,7 @@
 				if(requestRes.data.isInDatabase){
 					getApp().globalData.isLogin=true;
 					getApp().globalData.username=requestRes.data.username;
-					getApp().globalData.avatar_url=requestRes.data.avatar_url;
+					getApp().globalData.avatar_url='http://111.229.117.144:8000'+requestRes.data.avatar_url;
 				}
 			    console.log('登录结束globaldata:',getApp().globalData);
 			    // 处理后端返回的登录信息

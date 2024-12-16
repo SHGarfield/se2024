@@ -79,6 +79,7 @@
 				title: getApp().globalData.itemData.title,
 				content: getApp().globalData.itemData.content,
 				marks: getApp().globalData.itemData.marks,
+				isprivate: true,
 			},
 			success: function(res) {
 				console.log('数据提交成功', res);

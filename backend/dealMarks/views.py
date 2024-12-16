@@ -18,6 +18,7 @@ def addMarks(request):
         new_instance.title = databody['title']
         new_instance.content = databody['content']
         new_instance.marks=databody['marks']
+        new_instance.isprivate=databody['isprivate']
 
         # 获取当前UTC时间
         current_utc_time = datetime.now(timezone.utc)
@@ -43,9 +44,13 @@ def getMarks(request):
         databody = json.loads(request.body)
         print("databody:",databody)
         
+        isprivate = databody.get('isprivate')
         openid = databody.get('openid')
         # 过滤出所有符合条件的条目
-        matching_entries = models.Marks.objects.filter(openid=openid)
+        if isprivate:
+            matching_entries = models.Marks.objects.filter(openid=openid,isprivate=True)
+        else:
+            matching_entries = models.Marks.objects.filter(openid=openid,isprivate=False)
         
         # 将查询集转换为列表
         entries_list = list(matching_entries.values('id', 'modified_time','title','content','marks'))  # 根据需要选择字段
@@ -60,7 +65,7 @@ def getAllMarks(request):
         
         openid = databody.get('openid')
         # 过滤出所有符合条件的条目
-        matching_entries = models.Marks.objects.all()
+        matching_entries = models.Marks.objects.filter(isprivate=False)
         
         # 将查询集转换为列表
         entries_list = list(matching_entries.values('id', 'modified_time','title','content','marks'))  # 根据需要选择字段

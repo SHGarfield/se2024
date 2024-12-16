@@ -10,4 +10,5 @@ class Marks(models.Model):
     title=models.CharField(max_length=20)
     content=models.CharField(max_length=210)
     marks = models.JSONField()
+    isprivate = models.BooleanField(default=True)
     

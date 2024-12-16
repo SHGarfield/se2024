@@ -42,20 +42,53 @@
 			</view>
 		</view>
 		<view class="list-section">
-			<text class="section-title">我的计划</text>
-			<scroll-view class="scroll-list" scroll-y :refresher-enabled="true" @refresherrefresh="handleRefresh"
-				:refresher-triggered="isRefreshing">
-				<view class="list-content">
-					<view class="item-card" v-for="(item, index) in listData" :key="index"
-						@click="() => handlePlan(item.marks)">
-						<text class="item-title">{{item.title}}</text>
-						<text class="item-content">{{item.content}}</text>
-						<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
-						<map class="item-map" :markers="item.marks" :include-points="item.marks"
-							style="pointer-events: none;"></map>
-					</view>
-				</view>
-			</scroll-view>
+			<view>
+				<text class="section-title">我的计划</text>
+			</view>
+			
+			<view class="route-kind">
+				<text :class="{ 'published-route-active': isPublishedActive, 'published-route': !isPublishedActive }"
+					@click="setActive('published')">
+					已发布
+				</text>
+				<text :class="{ 'private-route-active': isPrivateActive, 'private-route': !isPrivateActive }"
+					@click="setActive('private')">
+					草稿箱
+				</text>
+			</view>
+
+			<swiper class="swiper" :indicator-dots="false" :current="swiperPage">
+				<swiper-item>
+					<scroll-view class="scroll-list" scroll-y :refresher-enabled="true"
+						@refresherrefresh="handleRefresh" :refresher-triggered="isRefreshing">
+						<view class="list-content">
+							<view class="item-card" v-for="(item, index) in listData" :key="index"
+								@click="() => handlePlan(item.marks)">
+								<text class="item-title">{{item.title}}</text>
+								<text class="item-content">{{item.content}}</text>
+								<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
+								<map class="item-map" :markers="item.marks" :include-points="item.marks"
+									style="pointer-events: none;"></map>
+							</view>
+						</view>
+					</scroll-view>
+				</swiper-item>
+				<swiper-item>
+					<scroll-view class="scroll-list" scroll-y :refresher-enabled="true"
+						@refresherrefresh="handleRefresh" :refresher-triggered="isRefreshing">
+						<view class="list-content">
+							<view class="item-card" v-for="(item, index) in listData" :key="index"
+								@click="() => handlePlan(item.marks)">
+								<text class="item-title">{{item.title}}</text>
+								<text class="item-content">{{item.content}}</text>
+								<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
+								<map class="item-map" :markers="item.marks" :include-points="item.marks"
+									style="pointer-events: none;"></map>
+							</view>
+						</view>
+					</scroll-view>
+				</swiper-item>
+			</swiper>
 		</view>
 	</view>
 </template>
@@ -67,10 +100,12 @@
 	import {
 		onShow
 	} from '@dcloudio/uni-app';
+	const swiperPage = ref(1);
 	const isRefreshing = ref(false);
 	const avatar_url = ref("../../static/un_login.jpg");
 	const nickname = ref("");
 	const isLogin = ref(false); // 自动暴露给模板使用
+	const isprivate = ref(true);
 	const listData = ref([{
 			image: '/static/logo.png',
 			title: '标题1'
@@ -93,6 +128,35 @@
 			title: '标题5'
 		},
 	])
+	const isPublishedActive = ref(false);
+	const isPrivateActive = ref(true);
+	
+	const setActive = (type) => {
+	  if (type === 'published') {//点击“已发布”按钮
+		//调整按钮样式
+	    isPublishedActive.value = true;
+	    isPrivateActive.value = false;
+		switch_to_publish();
+	  } else {//点击“草稿箱”按钮
+	    isPrivateActive.value = true;
+	    isPublishedActive.value = false;
+		switch_to_private();
+	  }
+	};
+	
+	//swiper切换到“已发布”
+	const switch_to_publish=()=>{
+		swiperPage.value=0;
+		isprivate.value=false;
+		updateListData();
+	};
+	
+	//swiper切换到“草稿箱”
+	const switch_to_private=()=>{
+		swiperPage.value=1;
+		isprivate.value=true;
+		updateListData();
+	};
 	// const handlePlan = (markers) => {
 	// 	getApp().globalData.marks = markers;
 	// 	console.log(markers);
@@ -101,18 +165,18 @@
 	// 	});
 	// }
 	onShow(() => {
-		isLogin.value=getApp().globalData.isLogin;
+		isLogin.value = getApp().globalData.isLogin;
 		updateListData();
-		console.log("globalavatar(onshow)",getApp().globalData.avatar_url);
-		if(getApp().globalData.avatar_url){
-			avatar_url.value=getApp().globalData.avatar_url;
-			nickname.value=getApp().globalData.username;
-			isLogin.value=true;
+		console.log("globalavatar(onshow)", getApp().globalData.avatar_url);
+		if (getApp().globalData.avatar_url) {
+			avatar_url.value = getApp().globalData.avatar_url;
+			nickname.value = getApp().globalData.username;
+			isLogin.value = true;
 		}
 	});
 	const handleRefresh = () => {
 		isRefreshing.value = true;
-		console.log("openid:",getApp().globalData.openid);
+		console.log("openid:", getApp().globalData.openid);
 		updateListData();
 	}
 	const updateListData = () => {
@@ -121,6 +185,7 @@
 			method: 'POST',
 			data: {
 				openid: getApp().globalData.openid,
+				isprivate: isprivate.value,
 			},
 			success: function(res) {
 				console.log('我的旅程更新res', res);
@@ -140,6 +205,7 @@
 			}
 		});
 	}
+
 	function handleEdit() {
 		uni.navigateTo({
 			url: '/pages/userinfo/userinfo'
@@ -163,10 +229,38 @@
 	// 		url: '/pages/find/find'
 	// 	})
 	// }
-	
 </script>
 
 <style lang="scss">
+	.route-kind{
+		// border: 1px solid black;
+		display: flex;
+		justify-content: center;      /* 水平居中 */
+		align-items: center;
+	}
+	
+	.published-route,
+	.private-route {
+		border-bottom: 2px solid transparent;
+		/* 初始化边框 */
+		// font-weight: normal;
+		font-weight: bold;
+		color:gray;
+		font-size: 35rpx;
+		/* 初始化字体权重 */
+		margin: 0 10rpx;
+	}
+
+	.published-route-active,
+	.private-route-active {
+		border-bottom: 2px solid blue;
+		/* 点击后的边框颜色 */
+		font-weight: bold;
+		font-size: 35rpx;
+		margin: 0 10rpx;
+		/* 字体加粗 */
+	}
+
 	.my {
 		background-color: #f5f5f5;
 		min-height: 100vh;
@@ -221,12 +315,12 @@
 		padding: 10rpx 20rpx;
 	}
 
-	.my .list-section {
+	.list-section {
 		position: relative;
 		padding-top: 60rpx;
 	}
 
-	.my .list-section .section-title {
+	.section-title {
 		position: absolute;
 		top: 20rpx;
 		left: 30rpx;
@@ -235,10 +329,16 @@
 		font-weight: 500;
 	}
 
-	.my .scroll-list {
+	.scroll-list {
 		height: calc(75vh - 120rpx);
 		margin-top: 20rpx;
-		background-color: rgb(239,239,239);
+		background-color: rgb(239, 239, 239);
+	}
+
+	.swiper {
+		height: calc(75vh - 120rpx);
+		margin-top: 20rpx;
+		background-color: rgb(239, 239, 239);
 	}
 
 	.my .scroll-list .list-content {
@@ -254,20 +354,20 @@
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-		overflow:hidden;
+		overflow: hidden;
 	}
-	
+
 	.item-map {
 		width: 100%;
 		height: 300rpx;
 	}
-	
+
 	.item-title {
 		padding: 20rpx 20rpx 5rpx 20rpx;
 		font-size: 40rpx;
 		font-weight: 800;
 	}
-	
+
 	.item-content {
 		padding: 0 20rpx;
 		font-size: 35rpx;
