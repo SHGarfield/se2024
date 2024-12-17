@@ -68,7 +68,7 @@
 								<text class="item-content">{{item.content}}</text>
 								<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
 								<map class="item-map" :markers="item.marks" :include-points="item.marks"
-									style="pointer-events: none;"></map>
+									:enable-zoom='false' :enable-scroll="false"></map>
 							</view>
 						</view>
 					</scroll-view>

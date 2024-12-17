@@ -125,10 +125,16 @@
 	})
 	const sendMarkersToServer = async () => {
 		
+		
+		// getApp().globalData.markers=state.markers;
+		getApp().globalData.itemData={
+			marks:state.markers,
+			title:'',
+			content:'',
+		}
 		wx.navigateTo({
-		  url: '/pages/handInMap/handInMap'
+		  url: '/pages/my_map_edit/my_map_edit'
 		});
-		getApp().globalData.markers=state.markers;
 		console.log(getApp().globalData.markers);
 		// wx.request({
 		// 	url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 你的后端服务器地址

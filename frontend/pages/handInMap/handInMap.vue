@@ -1,9 +1,19 @@
 <template>
-	<view class="view-container">
-	    <input type="text" class="input-text title-input" placeholder="输入标题" maxlength="30" @input="titleChange" />
-	    <textarea class="textarea-content" placeholder="输入内容" maxlength=200 @input="contentChange"></textarea>
-	    <button class="submit-button" @click="publish_route">发布</button>
-		<button class="submit-button" @click="save_private_route">保存到路线草稿</button>
+	<view class="list-section">
+		<scroll-view class="scroll-list" scroll-y>
+			<view class="list-content">
+				<map class="item-map" :markers="itemData.marks" :include-points="itemData.marks"></map>
+				<view class="item-text">
+					<input type="text" class="item-title" placeholder="输入标题" maxlength="30" v-model="itemData.title" @input="titleChange" />
+					<textarea class="item-content" placeholder="输入内容" maxlength=200
+						@input="contentChange" v-model="itemData.content"></textarea>
+				</view>
+			</view>
+		</scroll-view>
+		<view class="bottom-bar">
+			<!-- <button class="save-route-button" @click="saveRoute">编辑路线</button> -->
+			<button class="save-button" @click="save_private_route">保存到路线草稿</button>
+		</view>
 	</view>
 </template>
 
@@ -13,124 +23,158 @@
 		onMounted,
 		ref
 	} from 'vue';
-	const markers = ref([]);
-	onMounted(() =>{
-		// console.log("options:");
-		// markers.value = decodeURIComponent(query.storedData);
-		// console.log(markers);
-	});
-	// 页面B的js文件
-	const title = ref('');
-	const content = ref('');
-	const isprivate=ref(true);
+	import {
+		onShow
+	} from '@dcloudio/uni-app';
 
-	const titleChange = (e) => {
-		title.value = e.detail.value
-	};
-	const contentChange = (e) => {
-		content.value = e.detail.value;
-	};
-	const save_private_route=()=>{
-		isprivate.value=true;
-		submitData();
-	}
+	//存储帖子内容
+	const itemData=ref({});
 	
-	const publish_route=()=>{
-		isprivate.value=false;
+	//每次打开界面都获取帖子内容
+	onShow(() => {
+		getItemData();
+	});
+	//获取帖子内容
+	const getItemData = () => {
+		itemData.value.marks = getApp().globalData.markers;
+		console.log("itemData:(handinmap)", itemData.value);
+	};
+	//根据用户输入，更新title
+	const titleChange = (e) => {
+		itemData.value.title = e.detail.value
+	};
+	//根据用户输入，更新content
+	const contentChange = (e) => {
+		itemData.value.content = e.detail.value;
+	};
+	const save_private_route = () => {
 		submitData();
 	}
+
 	const submitData = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 后端API地址
 			method: 'POST',
 			data: {
-				openid:getApp().globalData.openid,
-				title: title.value,
-				content: content.value,
-				marks: getApp().globalData.markers, // 这里需要页面A的数据传递机制
-				isprivate: isprivate.value
+				openid: getApp().globalData.openid,
+				title: itemData.value.title,
+				content: itemData.value.content,
+				marks: itemData.value.marks, // 这里需要页面A的数据传递机制
+				isprivate: true,
 			},
 			success: function(res) {
 				console.log('数据提交成功', res);
 				wx.showToast({
-				  title: '上传成功', // 提示内容
-				  icon: 'success', // 图标类型
-				  duration: 2000 // 提示框停留时间
+					title: '上传成功', // 提示内容
+					icon: 'success', // 图标类型
+					duration: 2000 // 提示框停留时间
 				});
 				setTimeout(function() {
-				    backToMap();
-				  }, 2000);
+					backToMap();
+				}, 2000);
 			},
 			fail: function(err) {
 				console.error('数据提交失败', err);
 				wx.showToast({
-				  title: '上传失败，请检查网络', // 提示内容
-				  icon: 'error', // 图标类型
-				  duration: 2000 // 提示框停留时间
+					title: '上传失败，请检查网络', // 提示内容
+					icon: 'error', // 图标类型
+					duration: 2000 // 提示框停留时间
 				});
 			}
 		});
 	};
-	const backToMap=()=>{
+	const backToMap = () => {
 		wx.navigateBack({
-		  delta: 1
+			delta: 1
 		})
 	};
 </script>
 
 <style>
-	/* 页面整体容器样式 */
-	.view-container {
-	  display: flex;
-	  flex-direction: column;
-	  height: 100vh; /* 使容器高度为视口高度 */
-	  padding: 10px;
+	.list-section {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		border:2px solid green;
 	}
-	
-	/* 输入框样式 */
-	.input-text {
-	  width: 100%;
-	  padding: 8px;
-	  height: 50px;
-	  margin-bottom: 10px;
-	  border: 1px solid #ccc;
-	  border-radius: 4px;
-	  box-sizing: border-box;
+
+	.item-text {
+		padding: 10rpx;
+		display: flex;
+		flex-direction: column;
+		gap: 20rpx;
 	}
-	
-	/* 标题样式 */
-	.title-input {
-	  font-size: 24px; /* 固定大号字 */
-	  font-weight: bold; /* 加粗 */
-	  margin-bottom: 10px; /* 与输入框间距 */
+
+	.bottom-bar {
+		position: absolute;
+		background-color: #eaeaea;
+		bottom: 0;
+		padding: 10rpx;
+		height: 120rpx;
+		width: 98%;
 	}
-	
-	/* 文本区域样式 */
-	.textarea-content {
-	width: 100%;
-	  flex: 1; /* 自适应填充剩余空间 */
-	  padding: 8px;
-	  border: 1px solid #ccc;
-	  border-radius: 4px;
-	  box-sizing: border-box;
-	  margin-bottom: 10px;
-	  resize: none; /* 禁止调整大小 */
+
+	button {
+		position: absolute;
+		top: 15rpx;
+		right: 30rpx;
+		background-color: #007AFF;
+		color: white;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		border-radius: 60rpx;
+		font-weight: 400;
+		font-size: 27rpx;
+		width: 250rpx;
+		height: 80rpx;
 	}
-	
-	/* 按钮样式 */
-	.submit-button {
+
+	.publish-button {
+		right: 300rpx;
+		background-color: white;
+		border: 1px solid #007AFF;
+		color: #007AFF;
+		width: 180rpx;
+	}
+
+
+	.list-content {
+		display: flex;
+		flex-direction: column;
+		gap: 20rpx;
+	}
+
+	.scroll-list {
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f5f5;
+		height: 100vh;
+	}
+
+	.item-map {
 		width: 100%;
-	  padding: 10px 20px;
-	  background-color: #007bff;
-	  color: white;
-	  border: none;
-	  border-radius: 4px;
-	  cursor: pointer;
-	  font-size: 16px;
-	  margin-bottom: 40px; /* 与文本区域间距 */
+		height: 800rpx;
 	}
-	
-	.submit-button:hover {
-	  background-color: #0056b3;
+
+	.item-title {
+		padding: 20rpx;
+		font-size: 40rpx;
+		font-weight: 800;
+		border-bottom:1px solid lightgrey;
+	}
+
+	.item-content {
+		width:96%;
+		padding: 0 2%;
+		font-size: 35rpx;
+		height:360rpx;
+	}
+
+	.modified-time {
+		padding: 0 20rpx;
+		font-size: 30rpx;
+		color: gray;
 	}
 </style>
