@@ -43,6 +43,7 @@
 					success: function(res) {
 						console.log('nickname成功:', res);
 						getApp().globalData.username = nickname;
+						getApp().globalData.isLogin=true;
 						console.log('nickname', nickname, 'globalnick', getApp().globalData.username);
 					},
 					fail: function(err) {

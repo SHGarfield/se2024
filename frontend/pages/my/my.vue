@@ -209,6 +209,7 @@
 		if (getApp().globalData.username) {
 			isLogin.value = true;
 			nickname.value = getApp().globalData.username;
+			getApp().globalData.isLogin=true;
 		} else {
 			uni.navigateTo({
 				url: '/pages/login/login'
@@ -218,6 +219,7 @@
 
 	function logout() {
 		isLogin.value = false;
+		getApp().globalData.isLogin=false;
 	}
 </script>
 
