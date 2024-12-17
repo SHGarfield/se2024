@@ -17,6 +17,7 @@
 		  username:"",
 		  itemData:{},
 		  isLogin:false,
+		  map_cache:{},
 		},
 		methods: {
 			// 调用微信登录
