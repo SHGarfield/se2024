@@ -75,15 +75,21 @@
 		toValue,
 		computed,
 	} from 'vue';
-	import { onShow,onHide } from '@dcloudio/uni-app';
+	import {
+		onShow,
+		onHide
+	} from '@dcloudio/uni-app';
 	import {
 		setupQQMap
 	} from '../../libs/functions/setupQQMap.js';
 	import {
+		searchPoi
+	} from '../../libs/functions/gaodeAPI.mjs';
+	import {
 		locationInfo
 	} from '../../libs/functions/locationInfo.js';
 	const qqmapsdk = ref(null);
-	
+
 	// 定义响应式状态
 	const state = reactive({
 		marker_added: false,
@@ -115,25 +121,26 @@
 		// 页面加载时执行的初始化操作
 		setupQQMap(qqmapsdk);
 	});
-	onShow(()=>{
-		if(getApp().globalData.marks){
-		state.markers = getApp().globalData.marks;}
-		console.log("statet.marke4s:",state.markers)
+	onShow(() => {
+		if (getApp().globalData.marks) {
+			state.markers = getApp().globalData.marks;
+		}
+		console.log("statet.marke4s:", state.markers)
 	})
-	onHide(()=>{
-		getApp().globalData.marks=state.markers;
+	onHide(() => {
+		getApp().globalData.marks = state.markers;
 	})
 	const sendMarkersToServer = async () => {
-		
-		
+
+
 		// getApp().globalData.markers=state.markers;
-		getApp().globalData.itemData={
-			marks:state.markers,
-			title:'',
-			content:'',
+		getApp().globalData.itemData = {
+			marks: state.markers,
+			title: '',
+			content: '',
 		}
 		wx.navigateTo({
-		  url: '/pages/my_map_edit/my_map_edit'
+			url: '/pages/my_map_edit/my_map_edit'
 		});
 		console.log(getApp().globalData.markers);
 		// wx.request({
@@ -309,7 +316,7 @@
 	const onSearching = ref(false);
 
 	const onSearch = () => {
-		searchLocation(qqmapsdk, searchText.value);
+		searchLocation(searchText.value);
 		unshowDetailPanel();
 	};
 
@@ -323,15 +330,13 @@
 	const showResearchMarkers = () => {
 		//如果第一次使用搜索，则存储当前的点
 		if (!onSearching.value) {
-			console.log(1);
-			console.log("brfore", markers_store);
+			console.log("brfore", markers_store.value);
 			for (let i = 0; i < state.markers.length; i++) {
 				markers_store.value.push(state.markers[i]);
 			}
 			// markers_store.value = state.markers;
-			console.log("store", markers_store);
+			console.log("store", markers_store.value);
 		}
-		console.log(2)
 		//将显示数组变为搜索的点
 		state.markers = searched_markers.value;
 		//标记状态为搜索中
@@ -483,41 +488,66 @@
 	}
 
 	// 地点搜索
-	const searchLocation = (qqmapsdk, search_text) => {
-		// 调用接口
-		qqmapsdk.value.search({
-			keyword: search_text, //搜索关键词
-			location: {
-				latitude: mapCenterProxy.value.latitude,
-				longitude: mapCenterProxy.value.longitude
-			}, //设置周边搜索中心点
-			success: function(res) { //搜索成功后的回调
-				let mks = [];
-				for (let i = 0; i < res.data.length; i++) {
-					mks.push({ // 获取返回结果，放到mks数组中
-						title: res.data[i].title,
-						id: mks.length,
-						latitude: res.data[i].location.lat,
-						longitude: res.data[i].location.lng,
-						// iconPath: "/resources/my_marker.png", //图标路径
-						width: 20,
-						height: 20
+	// const searchLocation = (qqmapsdk, search_text) => {
+	// 	// 调用接口
+	// 	qqmapsdk.value.search({
+	// 		keyword: search_text, //搜索关键词
+	// 		location: {
+	// 			latitude: mapCenterProxy.value.latitude,
+	// 			longitude: mapCenterProxy.value.longitude
+	// 		}, //设置周边搜索中心点
+	// 		success: function(res) { //搜索成功后的回调
+	// 			let mks = [];
+	// 			for (let i = 0; i < res.data.length; i++) {
+	// 				mks.push({ // 获取返回结果，放到mks数组中
+	// 					title: res.data[i].title,
+	// 					id: mks.length,
+	// 					latitude: res.data[i].location.lat,
+	// 					longitude: res.data[i].location.lng,
+	// 					// iconPath: "/resources/my_marker.png", //图标路径
+	// 					width: 20,
+	// 					height: 20
+	// 				});
+	// 			}
+	// 			searched_markers.value = mks; // 更新markers数组
+	// 			// console.log("sercherdmarkers:", searched_markers.value);
+	// 			showResearchMarkers();
+	// 			// console.log("mks[0]", mks[0]);
+	// 			setMapCenterProxy(mks[0].latitude, mks[0].longitude);
+	// 		},
+	// 		fail: function(res) {
+	// 			console.log(res);
+	// 		},
+	// 		complete: function(res) {
+	// 			console.log(res);
+	// 		}
+	// 	});
+	// };
+	const searchLocation = async(keyword) => {
+		if (keyword) {
+			try {
+				const results = await searchPoi(keyword);
+				console.log("search results:",results);
+				if (results.length) {
+					searched_markers.value = results;
+					showResearchMarkers();
+					// setMapCenterProxy(searched_markers.value[0].latitude, searched_markers.value[0].longitude);
+				} else {
+					wx.showToast({
+						title: '无结果', // 提示内容
+						icon: 'none', // 图标类型，无结果时通常使用'none'
+						duration: 1000 // 提示框停留时间
 					});
 				}
-				searched_markers.value = mks; // 更新markers数组
-				// console.log("sercherdmarkers:", searched_markers.value);
-				showResearchMarkers();
-				// console.log("mks[0]", mks[0]);
-				setMapCenterProxy(mks[0].latitude, mks[0].longitude);
-			},
-			fail: function(res) {
-				console.log(res);
-			},
-			complete: function(res) {
-				console.log(res);
+			} catch (error) {
+				wx.showToast({
+					title: '请求失败', // 提示内容
+					icon: 'error', // 图标类型
+					duration: 1000 // 提示框停留时间
+				});
 			}
-		});
-	};
+		}
+	}
 
 	//设置所有点串联的路线
 	const planRoute = () => {
