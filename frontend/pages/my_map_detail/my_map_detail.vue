@@ -1,6 +1,5 @@
 <template>
 	<view class="list-section">
-		<!-- <scroll-view class="scroll-list" scroll-y :refresher-enabled="true" @refresherrefresh="handleRefresh" :refresher-triggered="isRefreshing"> -->
 		<scroll-view class="scroll-list" scroll-y>
 			<view class="list-content">
 				<map class="item-map" :markers="itemData.marks" :include-points="itemData.marks"></map>
@@ -13,7 +12,7 @@
 			</view>
 		</scroll-view>
 		<view class="bottom-bar">
-			<button class="save-route-button" @click="saveRoute">编辑路线</button>
+			<button class="save-route-button" @click="editRoute">编辑路线</button>
 		</view>
 	</view>
 </template>
@@ -21,7 +20,9 @@
 
 <script setup>
 	import {
-		ref,computed, onMounted 
+		ref,
+		computed,
+		onMounted
 	} from 'vue'
 
 	import {
@@ -44,15 +45,20 @@
 
 	// };
 	//重设time的格式
-	const format_modified_time =() => {
-	  itemData.value.modified_time='编辑于'+itemData.value.modified_time.replace(/T/,'  ').replace(/Z/,'');
+	const format_modified_time = () => {
+		itemData.value.modified_time = '编辑于' + itemData.value.modified_time.replace(/T/, '  ').replace(/Z/, '');
 	};
 	onShow(() => {
 		getItemData();
 	});
-	onMounted(()=>{
+	onMounted(() => {
 		format_modified_time();
 	});
+	const editRoute = () => {
+		wx.navigateTo({
+			url: '/pages/my_map_edit/my_map_edit'
+		})
+	};
 	const saveRoute = () => {
 		//检查是否登录
 		if (getApp().globalData.openid) {
@@ -178,15 +184,6 @@
 		min-height: 100vh;
 	}
 
-	.item-card {
-		background-color: #ffffff;
-		border-radius: 30rpx;
-		display: flex;
-		flex-direction: column;
-		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-		overflow: hidden;
-	}
-
 	.item-map {
 		width: 100%;
 		height: 800rpx;
@@ -203,11 +200,11 @@
 		font-size: 35rpx;
 		/* font-weight: 800; */
 	}
-	
+
 	.modified-time {
 		padding: 0 20rpx;
 		font-size: 30rpx;
-		color:gray;
+		color: gray;
 		/* font-weight: 800; */
 	}
 </style>

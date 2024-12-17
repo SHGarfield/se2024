@@ -56,7 +56,13 @@
 		{
 			"path": "pages/my_map_detail/my_map_detail",
 			"style": {
-				"navigationBarTitleText": "查看我的帖子"
+				"navigationBarTitleText": "查看我的路线"
+			}
+		},
+		{
+			"path": "pages/my_map_edit/my_map_edit",
+			"style": {
+				"navigationBarTitleText": "编辑我的路线"
 			}
 		}
 	],
