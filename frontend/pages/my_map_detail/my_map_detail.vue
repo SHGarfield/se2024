@@ -13,7 +13,7 @@
 			</view>
 		</scroll-view>
 		<view class="bottom-bar">
-			<button class="save-route-button" @click="saveRoute">保存路线</button>
+			<button class="save-route-button" @click="saveRoute">编辑路线</button>
 		</view>
 	</view>
 </template>
@@ -21,7 +21,7 @@
 
 <script setup>
 	import {
-		ref,onMounted 
+		ref,computed, onMounted 
 	} from 'vue'
 
 	import {

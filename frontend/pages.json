@@ -52,6 +52,12 @@
 			"style": {
 				"navigationBarTitleText": "查看路线帖子"
 			}
+		},
+		{
+			"path": "pages/my_map_detail/my_map_detail",
+			"style": {
+				"navigationBarTitleText": "查看我的帖子"
+			}
 		}
 	],
 	"tabBar": {
