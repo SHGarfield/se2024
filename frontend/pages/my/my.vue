@@ -3,10 +3,6 @@
 		<!-- 未登录状态 -->
 		<view class="user-card" v-if="!isLogin">
 			<view class="user-info">
-				<!-- 左侧头像 -->
-				<view class="avatar-box">
-					<image class="avatar" :src="avatar_url" mode="aspectFill"></image>
-				</view>
 				<!-- 中间信息列 -->
 				<view class="info-column">
 					<text class="username">未登录</text>
@@ -14,20 +10,12 @@
 						<text class="sub-text">点击登录账号</text>
 					</view>
 				</view>
-				<!-- 右侧设置按钮 -->
-				<view class="setting-box" @click="updateListData">
-					<text class="setting-text">设置</text>
-				</view>
 			</view>
 		</view>
 
 		<!-- 已登录状态 -->
 		<view class="user-card" v-else>
 			<view class="user-info">
-				<!-- 左侧头像 -->
-				<view class="avatar-box">
-					<image class="avatar" :src="avatar_url" mode="aspectFill"></image>
-				</view>
 				<!-- 中间信息列 -->
 				<view class="info-column">
 					<text class="username">{{nickname}}</text>
@@ -36,8 +24,8 @@
 					</view>
 				</view>
 				<!-- 右侧设置按钮 -->
-				<view class="setting-box" @click="handleOption">
-					<text class="setting-text">设置</text>
+				<view class="setting-box" @click="logout">
+					<text class="setting-text">退出登录</text>
 				</view>
 			</view>
 		</view>
@@ -45,7 +33,7 @@
 			<view>
 				<text class="section-title">我的计划</text>
 			</view>
-			
+
 			<view class="route-kind">
 				<text :class="{ 'published-route-active': isPublishedActive, 'published-route': !isPublishedActive }"
 					@click="setActive('published')">
@@ -61,7 +49,9 @@
 				<swiper-item>
 					<scroll-view class="scroll-list" scroll-y :refresher-enabled="true"
 						@refresherrefresh="handleRefresh" :refresher-triggered="isRefreshing">
-						<view class="list-content">
+						<view v-if="!isLogin" class="empty-message">请"登录"后使用</view>
+						<view v-else-if="listData.length === 0" class="empty-message">这里空空如也</view>
+						<view v-else class="list-content">
 							<view class="item-card" v-for="(item, index) in listData" :key="index"
 								@click="() => handlePlan(item)">
 								<text class="item-title">{{item.title}}</text>
@@ -76,7 +66,9 @@
 				<swiper-item>
 					<scroll-view class="scroll-list" scroll-y :refresher-enabled="true"
 						@refresherrefresh="handleRefresh" :refresher-triggered="isRefreshing">
-						<view class="list-content">
+						<view v-if="!isLogin" class="empty-message">请"登录"后使用</view>
+						<view v-else-if="listData.length === 0" class="empty-message">这里空空如也</view>
+						<view v-else class="list-content">
 							<view class="item-card" v-for="(item, index) in listData" :key="index"
 								@click="() => handlePlan(item)">
 								<text class="item-title">{{item.title}}</text>
@@ -102,7 +94,7 @@
 	} from '@dcloudio/uni-app';
 	const swiperPage = ref(1);
 	const isRefreshing = ref(false);
-	const avatar_url = ref("../../static/un_login.jpg");
+	// const avatar_url = ref("../../static/un_login.jpg");
 	const nickname = ref("");
 	const isLogin = ref(false); // 自动暴露给模板使用
 	const isprivate = ref(true);
@@ -130,49 +122,50 @@
 	])
 	const isPublishedActive = ref(false);
 	const isPrivateActive = ref(true);
-	
+
 	const setActive = (type) => {
-	  if (type === 'published') {//点击“已发布”按钮
-		//调整按钮样式
-	    isPublishedActive.value = true;
-	    isPrivateActive.value = false;
-		switch_to_publish();
-	  } else {//点击“草稿箱”按钮
-	    isPrivateActive.value = true;
-	    isPublishedActive.value = false;
-		switch_to_private();
-	  }
+		if (type === 'published') { //点击“已发布”按钮
+			//调整按钮样式
+			isPublishedActive.value = true;
+			isPrivateActive.value = false;
+			switch_to_publish();
+		} else { //点击“草稿箱”按钮
+			isPrivateActive.value = true;
+			isPublishedActive.value = false;
+			switch_to_private();
+		}
 	};
-	
+
 	//swiper切换到“已发布”
-	const switch_to_publish=()=>{
-		swiperPage.value=0;
-		isprivate.value=false;
+	const switch_to_publish = () => {
+		swiperPage.value = 0;
+		isprivate.value = false;
 		updateListData();
 	};
-	
+
 	//swiper切换到“草稿箱”
-	const switch_to_private=()=>{
-		swiperPage.value=1;
-		isprivate.value=true;
+	const switch_to_private = () => {
+		swiperPage.value = 1;
+		isprivate.value = true;
 		updateListData();
 	};
 	const handlePlan = (item) => {
 		getApp().globalData.itemData = item;
-		console.log("item:",item);
+		console.log("item:", item);
 		wx.navigateTo({
 			url: '/pages/my_map_detail/my_map_detail' // 替换为实际的目标页面路径
 		});
 	}
 	onShow(() => {
 		isLogin.value = getApp().globalData.isLogin;
+		nickname.value = getApp().globalData.username;
 		updateListData();
-		console.log("globalavatar(onshow)", getApp().globalData.avatar_url);
-		if (getApp().globalData.avatar_url) {
-			avatar_url.value = getApp().globalData.avatar_url;
-			nickname.value = getApp().globalData.username;
-			isLogin.value = true;
-		}
+		// console.log("globalavatar(onshow)", getApp().globalData.avatar_url);
+		// if (getApp().globalData.avatar_url) {
+		// 	avatar_url.value = getApp().globalData.avatar_url;
+		// 	nickname.value = getApp().globalData.username;
+		// 	isLogin.value = true;
+		// }
 	});
 	const handleRefresh = () => {
 		isRefreshing.value = true;
@@ -208,39 +201,42 @@
 
 	function handleEdit() {
 		uni.navigateTo({
-			url: '/pages/userinfo/userinfo'
-		})
-	}
-
-	function handleLogin() {
-		uni.navigateTo({
 			url: '/pages/login/login'
 		})
 	}
 
-	function handleOption() {
-		uni.navigateTo({
-			url: '/pages/option/option'
-		})
+	function handleLogin() {
+		if (getApp().globalData.username) {
+			isLogin.value = true;
+			nickname.value = getApp().globalData.username;
+		} else {
+			uni.navigateTo({
+				url: '/pages/login/login'
+			})
+		}
 	}
 
+	function logout() {
+		isLogin.value = false;
+	}
 </script>
 
 <style lang="scss">
-	.route-kind{
+	.route-kind {
 		// border: 1px solid black;
 		display: flex;
-		justify-content: center;      /* 水平居中 */
+		justify-content: center;
+		/* 水平居中 */
 		align-items: center;
 	}
-	
+
 	.published-route,
 	.private-route {
 		border-bottom: 2px solid transparent;
 		/* 初始化边框 */
 		// font-weight: normal;
 		font-weight: bold;
-		color:gray;
+		color: gray;
 		font-size: 35rpx;
 		/* 初始化字体权重 */
 		margin: 0 10rpx;
@@ -292,10 +288,10 @@
 		justify-content: center;
 	}
 
-	.my .user-card .user-info .info-column .username {
+	.username {
 		color: #ffffff;
-		font-size: 36rpx;
-		font-weight: 500;
+		font-size: 50rpx;
+		font-weight: 1000;
 		margin-bottom: 10rpx;
 	}
 

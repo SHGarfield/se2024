@@ -33,7 +33,7 @@ def wechat_login(request):
                     "openid": response_data["openid"],
                     "isInDatabase": True,
                     "username": userinfo.username,
-                    "avatar_url": userinfo.avatar_url,
+                    # "avatar_url": userinfo.avatar_url,
                 }
             )
         else:
@@ -70,36 +70,36 @@ def isUserOpenIdExist(_openid):
 
 # from django.http import JsonResponse
 # from django.views.decorators.csrf import csrf_exempt
-import os
+# import os
 
-UPLOAD_DIR = os.path.join(os.getcwd(), "static", "avatar")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+# UPLOAD_DIR = os.path.join(os.getcwd(), "static", "avatar")
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 # @csrf_exempt  # 如果在开发阶段跳过 CSRF 验证
-def upload_avatar(request):
-    print("\n---[upload_avatar]---")
-    if request.method == "POST" and request.FILES.get("avatar"):
-        avatar = request.FILES["avatar"]  # 获取上传的头像文件
-        file_path = os.path.join(UPLOAD_DIR, avatar.name)
+# def upload_avatar(request):
+#     print("\n---[upload_avatar]---")
+#     if request.method == "POST" and request.FILES.get("avatar"):
+#         avatar = request.FILES["avatar"]  # 获取上传的头像文件
+#         file_path = os.path.join(UPLOAD_DIR, avatar.name)
 
-        # 保存文件
-        with open(file_path, "wb+") as destination:
-            for chunk in avatar.chunks():
-                destination.write(chunk)
-        print("file_path:", file_path)
-        # 接受openid
-        openid = request.POST.dict().get("openid", None)
-        print("openid:", openid)
-        # 将文件路径保存到数据库
-        user = models.UserInfo.objects.filter(openid=openid).first()
-        user.avatar_url = file_path
-        user.save()
-        showAllUser()
-        return JsonResponse(
-            {"code": 200, "message": "头像上传成功", "file_path": file_path}
-        )
-    return JsonResponse({"code": 400, "message": "请求无效"}, status=400)
+#         # 保存文件
+#         with open(file_path, "wb+") as destination:
+#             for chunk in avatar.chunks():
+#                 destination.write(chunk)
+#         print("file_path:", file_path)
+#         # 接受openid
+#         openid = request.POST.dict().get("openid", None)
+#         print("openid:", openid)
+#         # 将文件路径保存到数据库
+#         user = models.UserInfo.objects.filter(openid=openid).first()
+#         user.avatar_url = file_path
+#         user.save()
+#         showAllUser()
+#         return JsonResponse(
+#             {"code": 200, "message": "头像上传成功", "file_path": file_path}
+#         )
+#     return JsonResponse({"code": 400, "message": "请求无效"}, status=400)
 
 
 def upload_username(request):
@@ -112,7 +112,11 @@ def upload_username(request):
         openid = data.get("openid")
         nickname = data.get("nickname")
         try:
-            add_user_to_db(openid, nickname)
+            if isUserOpenIdExist(openid):
+                # 如果用户已经存在，更新用户名
+                models.UserInfo.objects.filter(openid=openid).update(username=nickname)
+            else:
+                add_user_to_db(openid, nickname)
             return JsonResponse(
                 {"status": "success", "message": "Username updated successfully"}
             )
@@ -130,8 +134,8 @@ def add_user_to_db(openid, username):
     new_instance = models.UserInfo()
     new_instance.openid =openid
     new_instance.username = username
-    new_instance.email = "未填写"
-    new_instance.gender = "未填写"
+    # new_instance.email = "未填写"
+    # new_instance.gender = "未填写"
     new_instance.save()
     
 def showAllUser():
@@ -142,7 +146,7 @@ def showAllUser():
             "--user",
             entry.openid,
             entry.username,
-            entry.email,
-            entry.gender,
-            entry.avatar_url,
+            # entry.email,
+            # entry.gender,
+            # entry.avatar_url,
         )

@@ -1,13 +1,11 @@
 <template>
 	<view class="container">
 		<view class="avatar">
-			<button type="balanced" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
-				<image :src="avatarUrl" class="refreshIcon"></image>
-			</button>
+			<text>请输入您的昵称：</text>
 		</view>
 		<view class="nickname">
 			<text>昵称：</text>
-			<input class="inputNick" v-model="nickName" placeholder="请输入昵称" />
+			<input class="inputNick" v-model="nickName" placeholder="请输入昵称" maxlength="10" />
 		</view>
 		<button class="login-button" @click="login">登录</button>
 	</view>
@@ -29,62 +27,10 @@
 	export default {
 		data() {
 			return {
-				avatarUrl: '../../static/un_login.jpg',
 				nickName: ''
 			};
 		},
 		methods: {
-			//选择头像
-			onChooseAvatar(e) {
-				console.log(e.detail);
-				this.avatarUrl = e.detail.avatarUrl;
-			},
-
-			// 上传头像（点击登陆后调用）
-			async uploadAvatar(filePath) {
-				return new Promise((resolve, reject) => {
-					uni.uploadFile({
-						url: "http://111.229.117.144:8000/login/upload_avatar/", // 确保 URL 是正确的
-						filePath, // 临时文件路径
-						name: "avatar", // 后端接收文件的字段名
-						formData: {
-							openid: getApp().globalData.openid,
-						},
-						success: (uploadFileRes) => {
-							console.log("上传成功", uploadFileRes);
-							const response = JSON.parse(uploadFileRes.data);
-							if (response.code === 200) {
-								uni.showToast({
-									title: "上传成功",
-									icon: "success",
-								});
-								setTimeout(function() {
-									uni.navigateBack({
-										delta: 1
-									})
-								}, 1000);
-								resolve();
-							} else {
-								uni.showToast({
-									title: "上传失败",
-									icon: "error",
-								});
-								reject();
-							}
-						},
-						fail: (error) => {
-							console.error("上传失败", error);
-							uni.showToast({
-								title: "上传失败",
-								icon: "error",
-							});
-							reject(error);
-						},
-					});
-				});
-			},
-
-
 			async uploadUsername(nickname) {
 				console.log('nickname:', nickname);
 				wx.request({
@@ -96,7 +42,8 @@
 					},
 					success: function(res) {
 						console.log('nickname成功:', res);
-						getApp().globalData.username=nickname;
+						getApp().globalData.username = nickname;
+						console.log('nickname', nickname, 'globalnick', getApp().globalData.username);
 					},
 					fail: function(err) {
 						console.error('nickname失败', err);
@@ -108,17 +55,24 @@
 				try {
 					// 将用户信息保存，并调用登录流程
 					// await this.wxLogin();
-					if (this.avatarUrl === '../../static/un_login.jpg' || this.nickName === '') {
+					if (this.nickName === '') {
 						wx.showToast({
-							title: '缺少头像或昵称', // 提示内容
+							title: '昵称不能为空', // 提示内容
 							icon: 'error', // 图标类型
 							duration: 1500 // 提示框停留时间
 						});
 					} else {
 						await this.uploadUsername(this.nickName);
-						await this.uploadAvatar(this.avatarUrl);
-						getApp().globalData.avatar_url = this.avatarUrl;
-						console.log("getapp.aavatar:", getApp().globalData.avatar_url);
+						wx.showToast({
+							title: '更新信息成功', // 提示内容
+							icon: 'success', // 图标类型
+							duration: 1500 // 提示框停留时间
+						});
+						setTimeout(function() {
+							wx.navigateBack({
+								delta: 1
+							})
+						}, 2000);
 					}
 				} catch (error) {
 					console.error('获取用户信息失败:', error);
@@ -137,8 +91,12 @@
 	}
 
 	.avatar {
-		padding: 80rpx 0 40rpx;
+		padding: 380rpx 100rpx 140rpx 100rpx;
 		background: #fff;
+		font-size: 50rpx;
+		font-weight: 600;
+		
+		
 	}
 
 	.avatar button {

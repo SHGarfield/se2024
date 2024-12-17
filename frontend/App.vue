@@ -31,7 +31,7 @@
 			      code
 			    } = loginRes;
 			    console.log('微信登录 code:', code);
-			    // 将 code 发送到后端
+			    // 将 code 发送到后端，获得openid
 			    const requestRes = await uni.request({
 			      url: 'http://111.229.117.144:8000/login/login/', 
 			      method: 'POST',
@@ -39,12 +39,14 @@
 			        code: code,
 			      },
 			    });
-			    console.log('登录成功:', requestRes.data);
+			    console.log('登陆成功，从后端获得openid:', requestRes.data);
+				//保存openid作为唯一的身份识别
 			    getApp().globalData.openid = requestRes.data.openid;
+				//若用户在数据库中，直接获得昵称
 				if(requestRes.data.isInDatabase){
 					getApp().globalData.isLogin=true;
 					getApp().globalData.username=requestRes.data.username;
-					getApp().globalData.avatar_url='http://111.229.117.144:8000'+requestRes.data.avatar_url;
+					// getApp().globalData.avatar_url='http://111.229.117.144:8000'+requestRes.data.avatar_url;
 				}
 			    console.log('登录结束globaldata:',getApp().globalData);
 			    // 处理后端返回的登录信息
