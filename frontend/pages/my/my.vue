@@ -325,7 +325,11 @@
 		margin-top: 20rpx;
 		background-color: rgb(239, 239, 239);
 	}
-
+	.empty-message{
+		margin-top: 50%;
+		 text-align: center;
+		 color:gray;
+	}
 	.swiper {
 		height: calc(75vh - 120rpx);
 		margin-top: 20rpx;

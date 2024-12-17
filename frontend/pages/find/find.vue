@@ -2,7 +2,8 @@
 	<view class="list-section">
 		<text class="section-title" @click="updateListData">我的计划</text>
 		<scroll-view class="scroll-list" scroll-y :refresher-enabled="true" @refresherrefresh="handleRefresh"  :refresher-triggered="isRefreshing">
-			<view class="list-content">
+			<view v-if="listData.length === 0" class="empty-message">这里空空如也</view>
+			<view v-else class="list-content">
 				<view class="item-card" v-for="(item, index) in listData" :key="index"
 					@click="() => handlePlan(item)">
 					<text class="item-title">{{item.title}}</text>
@@ -86,6 +87,11 @@
 </script>
 
 <style scss>
+	.empty-message{
+		margin-top: 50%;
+		 text-align: center;
+		 color:gray;
+	}
 	.list-section {
 		position: relative;
 		padding-top: 60rpx;
