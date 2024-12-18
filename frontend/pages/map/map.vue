@@ -7,7 +7,7 @@
 		</view>
 		<map class="map" :longitude="mapCenterProxy.longitude" :latitude="mapCenterProxy.latitude"
 			:include-points="state.markers" :markers="state.markers" :polyline="polyline" @markertap="onMarkerTap"
-			@tap="onCommonTap" @regionchange="onRegionChange">
+			@tap="onCommonTap" @poitap="onPoiTap" @regionchange="onRegionChange">
 			<!-- @controltap="con" 
 		    :controls="con":scale="scale.value"
 			@tap="onMapTap"-->
@@ -83,7 +83,7 @@
 		reactive,
 		onMounted,
 		toValue,
-		computed,
+		computed
 	} from 'vue';
 	import {
 		onShow,
@@ -110,20 +110,6 @@
 			longitude: 116.391275,
 			tourDate: 0,
 			tourOrder: 1,
-			callout: {
-				content: '这里是气泡内容',
-				display: 'BYCLICK',
-				borderRadius: 10,
-				borderWidth: 2,
-				borderColor: '#000',
-				color: '#000',
-				fontSize: 14,
-				bgColor: '#fff',
-				padding: 10,
-				textAlign: 'center',
-				anchorX: 0,
-				anchorY: 0
-			}
 		}]
 	});
 	// 定义生命周期钩子
@@ -189,6 +175,7 @@
 		}
 		return 0;
 	}
+	//TODO bug
 	const getAllOrder = () => {
 		console.log("state markers(getAllOrder)", state.markers);
 		// if (state.markers.length > 1&&state.markers[state.markers.length - 2].tourDate) {
@@ -196,8 +183,8 @@
 		// }
 		// return 0;
 		for (let i = state.markers.length - 2; i >= 0; i--) {
-			console.log("markerDate", state.markers[i].tourDate);
-			console.log("value1", pickerValue1.value);
+			// 	console.log("markerDate", state.markers[i].tourDate);
+			// 	console.log("value1", pickerValue1.value);
 			if (state.markers[i].tourDate == pickerValue1.value) {
 				return state.markers[i].tourOrder;
 			}
@@ -225,11 +212,14 @@
 		showModal();
 		unshowDetailPanel();
 	}
+
+	//展示地点详情页
 	const showModal = () => {
 		modalVisible.value = true;
 		isPicker2Available.value = false;
 	};
 
+	//隐藏地点详情页
 	const hideModal = () => {
 		modalVisible.value = false;
 	};
@@ -264,13 +254,14 @@
 		const index = findMarkerIndexByDate(state.markers[state.markers.length - 1].tourDate, state.markers[state
 			.markers.length - 1].tourOrder);
 		// 使用临时变量来交换属性值
-		const tmpMark = {
-			id: state.markers[state.markers.length - 1].id,
-			latitude: state.markers[state.markers.length - 1].latitude,
-			longitude: state.markers[state.markers.length - 1].longitude,
-			tourDate: state.markers[state.markers.length - 1].tourDate,
-			tourOrder: state.markers[state.markers.length - 1].tourOrder,
-		};
+		// const tmpMark = {
+		// 	id: state.markers[state.markers.length - 1].id,
+		// 	latitude: state.markers[state.markers.length - 1].latitude,
+		// 	longitude: state.markers[state.markers.length - 1].longitude,
+		// 	tourDate: state.markers[state.markers.length - 1].tourDate,
+		// 	tourOrder: state.markers[state.markers.length - 1].tourOrder,
+		// };
+		const tmpMark = state.markers[state.markers.length-1];
 		state.markers.splice(index, 0, tmpMark);
 		state.markers.pop();
 
@@ -361,6 +352,10 @@
 		console.log("store_marker:", markers_store.value);
 		onSearching.value = false;
 	};
+	const onPoiTap = (e) => {
+		console.log("poi tapped:", e);
+		onCommonTap(e);
+	}
 	// 定义地图点击事件处理函数
 	const onCommonTap = async (e) => {
 		// locationInfo(qqmapsdk, e.detail,current_marker);
@@ -379,6 +374,7 @@
 					id: state.markers.length, // 新增标记点的ID
 					latitude: e.detail.latitude, // 点击事件返回的纬度
 					longitude: e.detail.longitude, // 点击事件返回的经度
+					standard_address: e.detail.name,
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
@@ -393,11 +389,19 @@
 		try {
 			const locationInfoRes = await locationInfo(qqmapsdk, location);
 			showDetail.value = true;
-			Object.assign(current_location.value, {
-				standard_address: locationInfoRes.result.formatted_addresses.standard_address,
-				recommend: locationInfoRes.result.formatted_addresses.recommend,
-				district: locationInfoRes.result.ad_info.name,
-			});
+			if (location.name) {
+				Object.assign(current_location.value, {
+					recommend: locationInfoRes.result.formatted_addresses.standard_address,
+					standard_address: locationInfoRes.result.formatted_addresses.recommend,
+					district: locationInfoRes.result.ad_info.name,
+				});
+			} else {
+				Object.assign(current_location.value, {
+					standard_address: locationInfoRes.result.formatted_addresses.standard_address,
+					recommend: locationInfoRes.result.formatted_addresses.recommend,
+					district: locationInfoRes.result.ad_info.name,
+				});
+			}
 			console.log("current_location:", current_location);
 		} catch (error) {
 			console.error("Error in locationInfo:", error);
@@ -411,9 +415,6 @@
 		console.log("Marker tapped: ", e);
 		setTimeout(() => {
 			state.tapEvent = "";
-			if (!onSearching.value) {
-				getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
-			}
 			Object.assign(current_location.value, {
 				id: e.markerId,
 				latitude: state.markers[e.markerId].latitude,
@@ -428,6 +429,11 @@
 				rating: state.markers[e.markerId].rating,
 				cost: state.markers[e.markerId].cost,
 			});
+			console.log("st:", state.markers[e.markerId]);
+			console.log("cu:", current_location.value);
+			if (!(onSearching.value || current_location.value.standard_address)) {
+				getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+			}
 		}, 200);
 	};
 	//视野变化则更新地图中心坐标
@@ -438,6 +444,7 @@
 		}
 	}
 
+	//增加新标注点到地图
 	const addMarker = () => {
 		state.marker_added = true;
 		if (!onSearching.value) {
@@ -446,12 +453,19 @@
 				state.markers[state.markers.length - 1], {
 					tourDate: pickerValue1.value,
 					tourOrder: pickerValue2.value,
+					standard_address: current_location.value.standard_address,
 				});
 			console.log("state markers(add marker)", state.markers);
 		} else {
 			console.log(current_location.value);
 			markers_store.value.push(getContentFromObject(current_location));
-			console.log("mar", markers_store);
+			// const m=getContentFromObject(current_location);
+			// const m=getContentFromObject(current_location);
+			// console.log("m",m);
+			// markers_store.value.push(m);
+			// console.log(markers_store.value[markers_store.value.length-1].rating);
+			// Object.assign(markers_store.value[markers_store.value.length-1],m);
+			console.log("markers_store", markers_store.value);
 			unshowResearchMarkers();
 		}
 	}
@@ -462,10 +476,22 @@
 			id: objectvalue.id,
 			latitude: objectvalue.latitude,
 			longitude: objectvalue.longitude,
+			tourDate: pickerValue1.value,
+			tourOrder: pickerValue2.value,
 			standard_address: objectvalue.standard_address,
 			recommend: objectvalue.recommend,
+			standard_address: objectvalue.standard_address,
+			district: objectvalue.district,
+			recommend: objectvalue.recommend,
+			tourDate: objectvalue.tourDate,
+			tourOrder: objectvalue.tourOrder,
+			opentime_week: objectvalue.opentime_week,
+			tel: objectvalue.tel,
+			rating: objectvalue.rating,
+			cost: objectvalue.cost,
 			// 复制其他需要的属性
 		};
+		console.log("newMarker(getContentFromObject)", newMarker);
 		return newMarker;
 	}
 
@@ -597,17 +623,21 @@
 		/* display: flex;
 		flex-direction: row; */
 	}
-	.opentime, .tel, .cost{
+
+	.opentime,
+	.tel,
+	.cost {
 		vertical-align: middle;
 		font-size: 25rpx;
 	}
+
 	.rating {
 		font-weight: 1000;
 		background-color: #fce9c4;
 		color: #f88326;
 		border-radius: 10rpx;
 		padding: 0 5rpx 0 8rpx;
-		margin-left:10rpx;
+		margin-left: 10rpx;
 	}
 
 	.full-screen {

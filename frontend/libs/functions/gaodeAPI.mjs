@@ -1,3 +1,48 @@
+const KEY = 'a740362743c88b599489eb7486e64bbd';
+// searchPOI.js
+export function searchPoi(keyword) {
+  return new Promise((resolve, reject) => {
+    const url = `https://restapi.amap.com/v5/place/text?key=${KEY}&keywords=${encodeURIComponent(keyword)}&show_fields=business`;
+    wx.request({
+      url: url,
+      method: 'GET',
+      success: (res) => {
+        console.log(1)
+        if (res.data.status === '1' && res.data.info === 'OK') {
+          console.log(res.data)
+          const pois = res.data.pois.map((poi, index) => {
+            const location = poi.location.split(',');
+            return {
+              id: index, // 使用索引作为id
+              // name: poi.name,
+              // address: poi.address,
+              latitude: parseFloat(location[1]), // 纬度
+              longitude: parseFloat(location[0]), // 经度
+              width: 30,
+              height: 50,
+              standard_address: poi.name,
+              district: poi.pname + poi.cityname + poi.adname,
+              recommend: poi.address,
+              opentime_week: poi.business.opentime_week,
+              tel: poi.business.tel,
+              rating: poi.business.rating,
+              cost: poi.business.cost,
+            };
+          });
+          console.log(pois);
+          resolve(pois); // 返回处理后的搜索结果
+        } else {
+          console.error('搜索失败', res.data.info);
+          reject({ error: res.data.info }); // 搜索失败返回错误信息
+        }
+      },
+      fail: (error) => {
+        console.error('请求失败', error);
+        reject({ error: error.errMsg }); // 请求失败返回错误信息
+      }
+    });
+  });
+};
 // searchPOI.js
 // export async function searchPoi(keyword) {
 //   const url = `https://restapi.amap.com/v5/place/text?key=a740362743c88b599489eb7486e64bbd&keywords=${encodeURIComponent(keyword)}&show_fields=business`;
@@ -37,75 +82,19 @@
 //     return { error: error.message }; // 请求失败返回错误信息
 //   }
 // }
-const KEY = 'a740362743c88b599489eb7486e64bbd';
-// searchPOI.js
-export function searchPoi(keyword) {
-  return new Promise((resolve, reject) => {
-    const url = `https://restapi.amap.com/v5/place/text?key=${KEY}&keywords=${encodeURIComponent(keyword)}&show_fields=business`;
-    wx.request({
-      url: url,
-      method: 'GET',
-      success: (res) => {
-        console.log(1)
-        if (res.data.status === '1' && res.data.info === 'OK') {
-          console.log(res.data)
-          const pois = res.data.pois.map((poi, index) => {
-            const location = poi.location.split(',');
-            return {
-              id: index, // 使用索引作为id
-              // name: poi.name,
-              // address: poi.address,
-              latitude: location[1], // 纬度
-              longitude: location[0], // 经度
-              width: 30,
-              height: 50,
-              standard_address:poi.name,
-              district:poi.pname+poi.cityname+poi.adname,
-              recommend:poi.address,
-              opentime_week: poi.business.opentime_week,
-              tel: poi.business.tel,
-              rating: poi.business.rating,
-              cost: poi.business.cost,
-            };
-          });
-          console.log(pois);
-          resolve(pois); // 返回处理后的搜索结果
-        } else {
-          console.error('搜索失败', res.data.info);
-          reject({ error: res.data.info }); // 搜索失败返回错误信息
-        }
-      },
-      fail: (error) => {
-        console.error('请求失败', error);
-        reject({ error: error.errMsg }); // 请求失败返回错误信息
-      }
-    });
-  });
-};
-
 // weatherService.js
 export async function getAmapWeather(cityAdcode) {
   try {
-    const response=await fetch("https://api.open.geovisearth.com/v2/cn/city/basic?location=[39,110]&token=ea338fcde38203d86e1e52ae886f21b4");
-    // const response = await fetch(`https://restapi.amap.com/v3/weather/weatherInfo?key=${KEY}&city=${cityAdcode}&extensions=all`);
-    // if (!response.ok) {
-    //   throw new Error(`HTTP error! status: ${response.status}`);
-    // }
-    console.log("response", response);
-    const data = await response.json();
-    console.log("data", data);
-    console.log("cast:",data.forecasts);
-    for (let i = 0; i < data.forecasts.length; i++) {
-      console.log(data.forecasts[i].casts);
+    const response = await fetch("https://api.open.geovisearth.com/v2/cn/city/basic?location=121.505936,31.254&token=4961712ea0a2dc98fbea97e43e700a0b");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    if (data.status === '1' && data.info === 'OK') {
-      return {
-        // temperature: weatherInfo.temperature,
-        // weather: weatherInfo.weather,
-        // windDirection: weatherInfo.winddirection,
-        // windPower: weatherInfo.windpower,
-        // reportTime: weatherInfo.reporttime
-      };
+    const data = await response.json();
+    console.log("get weather data:", data);
+    if (data.status === 0) {
+      for (let i = 0; i < 15; i++) {
+        console.log(data.result.datas[i]);}
+      return data.result;
     } else {
       throw new Error('未能获取天气信息');
     }
