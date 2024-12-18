@@ -6,7 +6,7 @@
 			<button v-else class="searchBarButton" @click="cancelSearch">取消</button>
 		</view>
 		<map class="map" :longitude="mapCenterProxy.longitude" :latitude="mapCenterProxy.latitude"
-			:include-points="state.markers" :markers="state.markers" :polyline="polyline" @markertap="onMarkerTap"
+			:include-points="focusMarker" :markers="state.markers" :polyline="polyline" @markertap="onMarkerTap"
 			@tap="onCommonTap" @poitap="onPoiTap" @regionchange="onRegionChange">
 			<!-- @controltap="con" 
 		    :controls="con":scale="scale.value"
@@ -107,6 +107,7 @@
 		tapEvent: "", // 点击事件状态
 		markers: [] //初始标记点数组
 	});
+	const focusMarker=ref([]);
 	// 定义生命周期钩子
 	onMounted(() => {
 		// 页面加载时执行的初始化操作
@@ -335,6 +336,8 @@
 		}
 		//将显示数组变为搜索的点
 		state.markers = searched_markers.value;
+		focusMarker.value.pop();
+		focusMarker.value.push(state.markers[0]);
 		//标记状态为搜索中
 		onSearching.value = true;
 	};
