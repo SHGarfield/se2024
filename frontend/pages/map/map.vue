@@ -438,12 +438,12 @@
 		}, 200);
 	};
 	//视野变化则更新地图中心坐标
-	const onRegionChange = (e) => {
-		// console.log(e);
-		if (e.type == "end") {
-			setMapCenterProxy(e.detail.centerLocation.latitude, e.detail.centerLocation.longitude);
-		}
-	}
+	// const onRegionChange = (e) => {
+	// 	// console.log(e);
+	// 	if (e.type == "end") {
+	// 		setMapCenterProxy(e.detail.centerLocation.latitude, e.detail.centerLocation.longitude);
+	// 	}
+	// }
 
 	//增加新标注点到地图
 	const addMarker = () => {
