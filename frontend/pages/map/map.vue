@@ -14,7 +14,7 @@
 		</map>
 	</view>
 
-	<page-container class="detail-panel" :show="showDetail" overlay="false" round="true" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
+	<page-container class="detail-panel" :show="showDetail" :overlay="false" :round="true" :close-on-slide-down="true">
 		<view class="detail-content">
 			<text v-if="current_location.tourDate" class="dateDetail">第{{current_location.tourDate}}天
 				第{{current_location.tourOrder}}个行程</text>
@@ -30,6 +30,7 @@
 				<text v-if="current_location.cost" class="cost">￥{{current_location.cost}}/人</text>
 			</view>
 			<text v-if="current_location.tel" class="tel">联系方式：{{current_location.tel}}</text>
+			<text>\n\n</text>
 			<!-- <text v-if="current_location.id >= 1&&route">距离：{{polyline.value[current_location.id-1][0].distance}}</text> -->
 			<!-- <text>距离：{{polyline[current_location.value.])}}</text> -->
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
@@ -661,18 +662,13 @@
 		width: 100%;
 	}
 
-	.detail-panel {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		background-color: #fff;
-		z-index: 100;
-		transition: transform 0.3s ease-in-out;
-	}
+/* 	.detail-panel {
+		height: 500rpx;
+	} */
 
-	.detail-panel-hidden {
+/* 	.detail-panel-hidden {
 		transform: translateY(100%);
-	}
+	} */
 
 	.detail-content {
 		display: flex;
