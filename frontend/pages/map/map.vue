@@ -2,8 +2,8 @@
 	<view class="full-screen">
 		<view class="search-page" v-if="!modalVisible">
 			<input type="text" v-model="searchText" placeholder="请输入搜索内容" />
-			<button class="searchBarButton" @click="onSearch">搜索</button>
-			<button class="searchBarButton" @click="cancelSearch">取消</button>
+			<button v-if="!onSearching" class="searchBarButton" @click="onSearch">搜索</button>
+			<button v-else class="searchBarButton" @click="cancelSearch">取消</button>
 		</view>
 		<map class="map" :longitude="mapCenterProxy.longitude" :latitude="mapCenterProxy.latitude"
 			:include-points="state.markers" :markers="state.markers" :polyline="polyline" @markertap="onMarkerTap"
