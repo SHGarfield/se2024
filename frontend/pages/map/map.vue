@@ -48,7 +48,7 @@
 		</view>
 	</page-container>
 	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
-	<button class="saveRoute" @click="sendMarkersToServer">发送标记</button>
+	<button class="saveRoute" @click="sendMarkersToServer" v-show="!onSearching">发送标记</button>
 	<view class="container">
 		<view class="modal" v-if="modalVisible">
 			<view class="modalPage">
