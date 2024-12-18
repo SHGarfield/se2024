@@ -104,13 +104,7 @@
 	const state = reactive({
 		marker_added: false,
 		tapEvent: "", // 点击事件状态
-		markers: [{ // 初始标记点数组
-			id: 0,
-			latitude: 39.906217,
-			longitude: 116.391275,
-			tourDate: 0,
-			tourOrder: 1,
-		}]
+		markers: [] //初始标记点数组
 	});
 	// 定义生命周期钩子
 	onMounted(() => {
@@ -261,7 +255,7 @@
 		// 	tourDate: state.markers[state.markers.length - 1].tourDate,
 		// 	tourOrder: state.markers[state.markers.length - 1].tourOrder,
 		// };
-		const tmpMark = state.markers[state.markers.length-1];
+		const tmpMark = state.markers[state.markers.length - 1];
 		state.markers.splice(index, 0, tmpMark);
 		state.markers.pop();
 
@@ -431,8 +425,14 @@
 			});
 			console.log("st:", state.markers[e.markerId]);
 			console.log("cu:", current_location.value);
-			if (!(onSearching.value || current_location.value.standard_address)) {
-				getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+			if (!onSearching.value) {
+				if (current_location.value.standard_address) {
+					const standard_address = current_location.value.standard_address;
+					getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+					state.markers.find(item => item.id === e.markerId).standard_address = standard_address;
+				} else {
+					getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+				}
 			}
 		}, 200);
 	};
