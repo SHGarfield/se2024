@@ -373,6 +373,8 @@
 					latitude: e.detail.latitude, // 点击事件返回的纬度
 					longitude: e.detail.longitude, // 点击事件返回的经度
 					standard_address: e.detail.name,
+					tourOrder:undefined,
+					tourDate:undefined
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
