@@ -16,10 +16,20 @@
 
 	<scroll-view class="detail-panel" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
 		<view class="detail-content">
-			<text class="dateDetail">第{{current_location.tourDate}}天 第{{current_location.tourOrder}}个行程</text>
+			<text v-if="current_location.tourDate" class="dateDetail">第{{current_location.tourDate}}天
+				第{{current_location.tourOrder}}个行程</text>
 			<text>id：{{current_location.id}}\n</text>
-			<text class="locationStandard">{{ current_location.standard_address}}</text>
+			<view class="detail-title">
+				<text class="locationStandard">{{ current_location.standard_address}}</text>
+				<text v-if="current_location.rating" class="rating">{{current_location.rating}}分️</text>
+			</view>
 			<text class="locationRecommend">{{current_location.district}} - {{ current_location.recommend}}附近</text>
+			<view class="detail-title">
+				<text v-if="current_location.opentime_week" class="opentime">{{current_location.opentime_week}}</text>
+				<text v-if="current_location.opentime_week&&current_location.cost" class="opentime"> | </text>
+				<text v-if="current_location.cost" class="cost">￥{{current_location.cost}}/人</text>
+			</view>
+			<text v-if="current_location.tel" class="tel">联系方式：{{current_location.tel}}</text>
 			<!-- <text v-if="current_location.id >= 1&&route">距离：{{polyline.value[current_location.id-1][0].distance}}</text> -->
 			<!-- <text>距离：{{polyline[current_location.value.])}}</text> -->
 			<!-- <image :src="location.image" mode="aspectFill"></image> -->
@@ -401,13 +411,22 @@
 		console.log("Marker tapped: ", e);
 		setTimeout(() => {
 			state.tapEvent = "";
-			getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+			if (!onSearching.value) {
+				getSelectedLocationInfo(state.markers.find(item => item.id === e.markerId));
+			}
 			Object.assign(current_location.value, {
 				id: e.markerId,
 				latitude: state.markers[e.markerId].latitude,
 				longitude: state.markers[e.markerId].longitude,
+				standard_address: state.markers[e.markerId].standard_address,
+				district: state.markers[e.markerId].district,
+				recommend: state.markers[e.markerId].recommend,
 				tourDate: state.markers[e.markerId].tourDate,
 				tourOrder: state.markers[e.markerId].tourOrder,
+				opentime_week: state.markers[e.markerId].opentime_week,
+				tel: state.markers[e.markerId].tel,
+				rating: state.markers[e.markerId].rating,
+				cost: state.markers[e.markerId].cost,
 			});
 		}, 200);
 	};
@@ -488,46 +507,11 @@
 	}
 
 	// 地点搜索
-	// const searchLocation = (qqmapsdk, search_text) => {
-	// 	// 调用接口
-	// 	qqmapsdk.value.search({
-	// 		keyword: search_text, //搜索关键词
-	// 		location: {
-	// 			latitude: mapCenterProxy.value.latitude,
-	// 			longitude: mapCenterProxy.value.longitude
-	// 		}, //设置周边搜索中心点
-	// 		success: function(res) { //搜索成功后的回调
-	// 			let mks = [];
-	// 			for (let i = 0; i < res.data.length; i++) {
-	// 				mks.push({ // 获取返回结果，放到mks数组中
-	// 					title: res.data[i].title,
-	// 					id: mks.length,
-	// 					latitude: res.data[i].location.lat,
-	// 					longitude: res.data[i].location.lng,
-	// 					// iconPath: "/resources/my_marker.png", //图标路径
-	// 					width: 20,
-	// 					height: 20
-	// 				});
-	// 			}
-	// 			searched_markers.value = mks; // 更新markers数组
-	// 			// console.log("sercherdmarkers:", searched_markers.value);
-	// 			showResearchMarkers();
-	// 			// console.log("mks[0]", mks[0]);
-	// 			setMapCenterProxy(mks[0].latitude, mks[0].longitude);
-	// 		},
-	// 		fail: function(res) {
-	// 			console.log(res);
-	// 		},
-	// 		complete: function(res) {
-	// 			console.log(res);
-	// 		}
-	// 	});
-	// };
-	const searchLocation = async(keyword) => {
+	const searchLocation = async (keyword) => {
 		if (keyword) {
 			try {
 				const results = await searchPoi(keyword);
-				console.log("search results:",results);
+				console.log("search results:", results);
 				if (results.length) {
 					searched_markers.value = results;
 					showResearchMarkers();
@@ -609,6 +593,23 @@
 
 
 <style>
+	.detail-title {
+		/* display: flex;
+		flex-direction: row; */
+	}
+	.opentime, .tel, .cost{
+		vertical-align: middle;
+		font-size: 25rpx;
+	}
+	.rating {
+		font-weight: 1000;
+		background-color: #fce9c4;
+		color: #f88326;
+		border-radius: 10rpx;
+		padding: 0 5rpx 0 8rpx;
+		margin-left:10rpx;
+	}
+
 	.full-screen {
 		display: flex;
 		flex-direction: column;
