@@ -57,8 +57,8 @@ export function searchPoi(keyword) {
               // address: poi.address,
               latitude: location[1], // 纬度
               longitude: location[0], // 经度
-              width: 20,
-              height: 20,
+              width: 30,
+              height: 50,
               standard_address:poi.name,
               district:poi.pname+poi.cityname+poi.adname,
               recommend:poi.address,
@@ -68,7 +68,7 @@ export function searchPoi(keyword) {
               cost: poi.business.cost,
             };
           });
-          console.log(pois)
+          console.log(pois);
           resolve(pois); // 返回处理后的搜索结果
         } else {
           console.error('搜索失败', res.data.info);
@@ -82,6 +82,38 @@ export function searchPoi(keyword) {
     });
   });
 };
+
+// weatherService.js
+export async function getAmapWeather(cityAdcode) {
+  try {
+    const response=await fetch("https://api.open.geovisearth.com/v2/cn/city/basic?location=[39,110]&token=ea338fcde38203d86e1e52ae886f21b4");
+    // const response = await fetch(`https://restapi.amap.com/v3/weather/weatherInfo?key=${KEY}&city=${cityAdcode}&extensions=all`);
+    // if (!response.ok) {
+    //   throw new Error(`HTTP error! status: ${response.status}`);
+    // }
+    console.log("response", response);
+    const data = await response.json();
+    console.log("data", data);
+    console.log("cast:",data.forecasts);
+    for (let i = 0; i < data.forecasts.length; i++) {
+      console.log(data.forecasts[i].casts);
+    }
+    if (data.status === '1' && data.info === 'OK') {
+      return {
+        // temperature: weatherInfo.temperature,
+        // weather: weatherInfo.weather,
+        // windDirection: weatherInfo.winddirection,
+        // windPower: weatherInfo.windpower,
+        // reportTime: weatherInfo.reporttime
+      };
+    } else {
+      throw new Error('未能获取天气信息');
+    }
+  } catch (error) {
+    console.error('请求天气信息失败:', error);
+    throw error; // 向外层抛出错误
+  }
+}
 
 /**
  * 高德地图逆地址解析函数
