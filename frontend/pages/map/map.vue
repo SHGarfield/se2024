@@ -14,7 +14,7 @@
 		</map>
 	</view>
 
-	<scroll-view class="detail-panel" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
+	<page-container class="detail-panel" :show="showDetail" overlay="false" round="true" :style="{ height: '30%', width: '100%' }" v-show="showDetail">
 		<view class="detail-content">
 			<text v-if="current_location.tourDate" class="dateDetail">第{{current_location.tourDate}}天
 				第{{current_location.tourOrder}}个行程</text>
@@ -45,7 +45,7 @@
 			<button class="deleteMarkerButton" @click="deleteMarker" v-show="!onSearching">移出行程</button>
 			<button class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
 		</view>
-	</scroll-view>
+	</page-container>
 	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
 	<button class="saveRoute" @click="sendMarkersToServer">发送标记</button>
 	<view class="container">
@@ -561,11 +561,20 @@
 
 	//设置所有点串联的路线
 	const planRoute = () => {
-		for (let i = 1; i < state.markers.length; i++) {
-			console.log("route:", i)
-			planRouteAtom(state.markers[i - 1], state.markers[i]);
+		if(state.markers.length>1){
+			for (let i = 1; i < state.markers.length; i++) {
+				console.log("route:", i)
+				planRouteAtom(state.markers[i - 1], state.markers[i]);
+			}
+			route_planned.value = true; //bug
 		}
-		route_planned.value = true; //bug
+		else{
+			wx.showToast({
+				title: '标记点过少', // 提示内容
+				icon: 'error', // 图标类型
+				duration: 1500 // 提示框停留时间
+			});
+		}
 	}
 
 	//设置相邻两点路线
