@@ -359,7 +359,7 @@
 		// locationInfo(qqmapsdk, e.detail,current_marker);
 
 		setTimeout(() => { // 避免markertap和commontap同时触发
-			if (state.tapEvent === "") { // 是commontap
+			if (state.tapEvent === ""&&!onSearching.value) { // 是commontap
 				//判断是否去除未保存点
 				if (!state.marker_added) {
 					state.markers.pop();
