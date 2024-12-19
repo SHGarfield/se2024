@@ -44,7 +44,7 @@
 				</view>
 			</picker>
 			<button class="deleteMarkerButton" @click="deleteMarker" v-show="!onSearching">移出行程</button>
-			<button class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
+			<button v-if="!current_location.tourOrder" class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
 		</view>
 	</page-container>
 	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
