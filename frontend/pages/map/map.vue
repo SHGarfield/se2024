@@ -107,7 +107,7 @@
 		tapEvent: "", // 点击事件状态
 		markers: [] //初始标记点数组
 	});
-	const focusMarker=ref([]);
+	const focusMarker = ref([]);
 	// 定义生命周期钩子
 	onMounted(() => {
 		// 页面加载时执行的初始化操作
@@ -328,10 +328,14 @@
 		//如果第一次使用搜索，则存储当前的点
 		if (!onSearching.value) {
 			console.log("brfore", markers_store.value);
-			for (let i = 0; i < state.markers.length; i++) {
-				markers_store.value.push(state.markers[i]);
-			}
-			// markers_store.value = state.markers;
+			console.log("state.markers", state.markers.length);
+			
+			// for (let i = 0; i < state.markers.length; i++) {
+			// 	console.log(i,"state.markers[]", state.markers[i]);
+			// 	markers_store.value.push(state.markers[i]);
+			// 	console.log("storein", markers_store);
+			// }
+			markers_store.value = state.markers;
 			console.log("store", markers_store.value);
 		}
 		//将显示数组变为搜索的点
@@ -359,7 +363,7 @@
 		// locationInfo(qqmapsdk, e.detail,current_marker);
 
 		setTimeout(() => { // 避免markertap和commontap同时触发
-			if (state.tapEvent === ""&&!onSearching.value) { // 是commontap
+			if (state.tapEvent === "" && !onSearching.value) { // 是commontap
 				//判断是否去除未保存点
 				if (!state.marker_added) {
 					state.markers.pop();
@@ -373,8 +377,8 @@
 					latitude: e.detail.latitude, // 点击事件返回的纬度
 					longitude: e.detail.longitude, // 点击事件返回的经度
 					standard_address: e.detail.name,
-					tourOrder:undefined,
-					tourDate:undefined
+					tourOrder: undefined,
+					tourDate: undefined
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
@@ -429,7 +433,7 @@
 			// 	rating: state.markers[e.markerId].rating,
 			// 	cost: state.markers[e.markerId].cost,
 			// });
-			current_location.value=state.markers[e.markerId];
+			current_location.value = state.markers[e.markerId];
 			console.log("st:", state.markers[e.markerId]);
 			console.log("cu:", current_location.value);
 			if (!onSearching.value) {
@@ -480,7 +484,7 @@
 
 	const getContentFromObject = (object) => {
 		const objectvalue = object.value;
-		console.log("pickerValue:",pickerValue1.value);
+		console.log("pickerValue:", pickerValue1.value);
 		const newMarker = {
 			id: objectvalue.id,
 			latitude: objectvalue.latitude,
@@ -497,7 +501,7 @@
 			// 复制其他需要的属性
 		};
 		console.log("newMarker(getContentFromObject)", newMarker);
-		console.log("newValue:",newMarker.tourDate);
+		console.log("newValue:", newMarker.tourDate);
 		return newMarker;
 	}
 
@@ -567,14 +571,13 @@
 
 	//设置所有点串联的路线
 	const planRoute = () => {
-		if(state.markers.length>1){
+		if (state.markers.length > 1) {
 			for (let i = 1; i < state.markers.length; i++) {
 				console.log("route:", i)
 				planRouteAtom(state.markers[i - 1], state.markers[i]);
 			}
 			route_planned.value = true; //bug
-		}
-		else{
+		} else {
 			wx.showToast({
 				title: '标记点过少', // 提示内容
 				icon: 'error', // 图标类型
@@ -667,11 +670,11 @@
 		width: 100%;
 	}
 
-/* 	.detail-panel {
+	/* 	.detail-panel {
 		height: 500rpx;
 	} */
 
-/* 	.detail-panel-hidden {
+	/* 	.detail-panel-hidden {
 		transform: translateY(100%);
 	} */
 
