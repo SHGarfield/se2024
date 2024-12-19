@@ -181,7 +181,7 @@
 	}
 
 	const getAllOrder = () => {
-		if (!onSearching) {
+		if (!onSearching.value) {
 			console.log("state markers(getAllOrder)", state.markers);
 			for (let i = state.markers.length - 2; i >= 0; i--) {
 				// 	console.log("markerDate", state.markers[i].tourDate);
