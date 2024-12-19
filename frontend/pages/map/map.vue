@@ -415,20 +415,21 @@
 		console.log("Marker tapped: ", e);
 		setTimeout(() => {
 			state.tapEvent = "";
-			Object.assign(current_location.value, {
-				id: e.markerId,
-				latitude: state.markers[e.markerId].latitude,
-				longitude: state.markers[e.markerId].longitude,
-				standard_address: state.markers[e.markerId].standard_address,
-				district: state.markers[e.markerId].district,
-				recommend: state.markers[e.markerId].recommend,
-				tourDate: state.markers[e.markerId].tourDate,
-				tourOrder: state.markers[e.markerId].tourOrder,
-				opentime_week: state.markers[e.markerId].opentime_week,
-				tel: state.markers[e.markerId].tel,
-				rating: state.markers[e.markerId].rating,
-				cost: state.markers[e.markerId].cost,
-			});
+			// Object.assign(current_location.value, {
+			// 	id: e.markerId,
+			// 	latitude: state.markers[e.markerId].latitude,
+			// 	longitude: state.markers[e.markerId].longitude,
+			// 	standard_address: state.markers[e.markerId].standard_address,
+			// 	district: state.markers[e.markerId].district,
+			// 	recommend: state.markers[e.markerId].recommend,
+			// 	tourDate: state.markers[e.markerId].tourDate,
+			// 	tourOrder: state.markers[e.markerId].tourOrder,
+			// 	opentime_week: state.markers[e.markerId].opentime_week,
+			// 	tel: state.markers[e.markerId].tel,
+			// 	rating: state.markers[e.markerId].rating,
+			// 	cost: state.markers[e.markerId].cost,
+			// });
+			current_location.value=state.markers[e.markerId];
 			console.log("st:", state.markers[e.markerId]);
 			console.log("cu:", current_location.value);
 			if (!onSearching.value) {
@@ -453,6 +454,7 @@
 	//增加新标注点到地图
 	const addMarker = () => {
 		state.marker_added = true;
+		console.log(pickerValue1.value);
 		if (!onSearching.value) {
 			// showDetailPanel();
 			Object.assign(
@@ -478,6 +480,7 @@
 
 	const getContentFromObject = (object) => {
 		const objectvalue = object.value;
+		console.log("pickerValue:",pickerValue1.value);
 		const newMarker = {
 			id: objectvalue.id,
 			latitude: objectvalue.latitude,
@@ -486,11 +489,7 @@
 			tourOrder: pickerValue2.value,
 			standard_address: objectvalue.standard_address,
 			recommend: objectvalue.recommend,
-			standard_address: objectvalue.standard_address,
 			district: objectvalue.district,
-			recommend: objectvalue.recommend,
-			tourDate: objectvalue.tourDate,
-			tourOrder: objectvalue.tourOrder,
 			opentime_week: objectvalue.opentime_week,
 			tel: objectvalue.tel,
 			rating: objectvalue.rating,
@@ -498,6 +497,7 @@
 			// 复制其他需要的属性
 		};
 		console.log("newMarker(getContentFromObject)", newMarker);
+		console.log("newValue:",newMarker.tourDate);
 		return newMarker;
 	}
 
