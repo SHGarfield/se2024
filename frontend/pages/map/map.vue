@@ -178,7 +178,7 @@
 		}
 		return 0;
 	}
-	
+
 	const getAllOrder = () => {
 		if (!onSearching) {
 			console.log("state markers(getAllOrder)", state.markers);
@@ -189,7 +189,7 @@
 					return state.markers[i].tourOrder;
 				}
 			}
-		}else{
+		} else {
 			console.log("markers_store(getAllOrder)", state.markers);
 			for (let i = markers_store.value.length - 1; i >= 0; i--) {
 				// 	console.log("markerDate", state.markers[i].tourDate);
@@ -379,7 +379,7 @@
 		setTimeout(() => { // 避免markertap和commontap同时触发
 			if (state.tapEvent === "" && !onSearching.value) { // 是commontap
 				//判断是否去除未保存点
-				if (!state.markers[state.markers.length-1].tourDate) {
+				if (state.markers.length>0 && !state.markers[state.markers.length - 1].tourDate) {
 					state.markers.pop();
 				}
 				state.marker_added = false;
@@ -392,7 +392,9 @@
 					longitude: e.detail.longitude, // 点击事件返回的经度
 					standard_address: e.detail.name,
 					tourOrder: undefined,
-					tourDate: undefined
+					tourDate: undefined,
+					width: 30,
+					height: 50,
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
