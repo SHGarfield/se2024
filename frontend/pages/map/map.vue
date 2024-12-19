@@ -47,7 +47,8 @@
 			<button v-if="!current_location.tourOrder" class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
 		</view>
 	</page-container>
-	<button class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
+	<button v-if="!route_planned" class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
+	<button v-else class="routePlanning" @click="clearRoute" v-show="!onSearching">隐藏路径</button>
 	<button class="saveRoute" @click="sendMarkersToServer" v-show="!onSearching">发送标记</button>
 	<view class="container">
 		<view class="modal" v-if="modalVisible">
@@ -379,7 +380,7 @@
 		setTimeout(() => { // 避免markertap和commontap同时触发
 			if (state.tapEvent === "" && !onSearching.value) { // 是commontap
 				//判断是否去除未保存点
-				if (state.markers.length>0 && !state.markers[state.markers.length - 1].tourDate) {
+				if (state.markers.length > 0 && !state.markers[state.markers.length - 1].tourDate) {
 					state.markers.pop();
 				}
 				state.marker_added = false;
@@ -584,6 +585,11 @@
 			}
 		}
 	}
+
+	const clearRoute = () => {
+		route_planned.value = false;
+		polyline.value.length=0;
+	};
 
 	//设置所有点串联的路线
 	const planRoute = () => {
