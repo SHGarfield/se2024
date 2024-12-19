@@ -165,24 +165,38 @@
 
 	const isPicker2Available = ref(false);
 	const getAllDate = () => {
-		console.log("state markers(getAllDate)", state.markers);
-		if (state.markers.length > 1 && state.markers[state.markers.length - 2].tourDate) {
+		//非搜索情况，从state.markers里搜
+		if (!onSearching.value && state.markers.length > 1 && state.markers[state.markers.length - 2].tourDate) {
+			console.log("state markers(getAllDate)", state.markers);
 			return state.markers[state.markers.length - 2].tourDate;
+		}
+		//搜索情况，从markers.store里搜
+		if (onSearching.value && markers_store.value.length > 0 && markers_store.value[markers_store.value.length - 1]
+			.tourDate) {
+			console.log("markers_store(getallDate)", markers_store.value);
+			return markers_store.value[markers_store.value.length - 1].tourDate;
 		}
 		return 0;
 	}
-	//TODO bug
+	
 	const getAllOrder = () => {
-		console.log("state markers(getAllOrder)", state.markers);
-		// if (state.markers.length > 1&&state.markers[state.markers.length - 2].tourDate) {
-		// 	return state.markers[state.markers.length - 2].tourDate;
-		// }
-		// return 0;
-		for (let i = state.markers.length - 2; i >= 0; i--) {
-			// 	console.log("markerDate", state.markers[i].tourDate);
-			// 	console.log("value1", pickerValue1.value);
-			if (state.markers[i].tourDate == pickerValue1.value) {
-				return state.markers[i].tourOrder;
+		if (!onSearching) {
+			console.log("state markers(getAllOrder)", state.markers);
+			for (let i = state.markers.length - 2; i >= 0; i--) {
+				// 	console.log("markerDate", state.markers[i].tourDate);
+				// 	console.log("value1", pickerValue1.value);
+				if (state.markers[i].tourDate == pickerValue1.value) {
+					return state.markers[i].tourOrder;
+				}
+			}
+		}else{
+			console.log("markers_store(getAllOrder)", state.markers);
+			for (let i = markers_store.value.length - 1; i >= 0; i--) {
+				// 	console.log("markerDate", state.markers[i].tourDate);
+				// 	console.log("value1", pickerValue1.value);
+				if (markers_store.value[i].tourDate == pickerValue1.value) {
+					return markers_store.value[i].tourOrder;
+				}
 			}
 		}
 		return 0;
@@ -329,7 +343,7 @@
 		if (!onSearching.value) {
 			console.log("brfore", markers_store.value);
 			console.log("state.markers", state.markers.length);
-			
+
 			// for (let i = 0; i < state.markers.length; i++) {
 			// 	console.log(i,"state.markers[]", state.markers[i]);
 			// 	markers_store.value.push(state.markers[i]);
