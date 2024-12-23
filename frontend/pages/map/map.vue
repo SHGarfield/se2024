@@ -643,7 +643,8 @@
 					width: 4,
 					duration: res.result.routes[0].duration,
 					distance: res.result.routes[0].distance,
-					taxi_fare: res.result.routes[0].taxi_fare.fare
+					taxi_fare: res.result.routes[0].taxi_fare.fare,
+					arrowLine:true
 				});
 				console.log("polyline:", polyline);
 			},
