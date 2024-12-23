@@ -62,10 +62,7 @@
 	const updateListData = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/getAllMarks/', // 后端API地址
-			method: 'POST',
-			data: {
-				openid: getApp().globalData.openid,
-			},
+			method: 'GET',
 			success: function(res) {
 				console.log('我的旅程更新res', res);
 				listData.value = res.data.data;

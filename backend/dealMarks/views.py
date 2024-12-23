@@ -6,6 +6,8 @@ import json
 from dealMarks import models
 # Create your views here.
 import sqlite3
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 def addMarks(request):
     if request.method == 'POST':
@@ -58,18 +60,29 @@ def getMarks(request):
         # 将列表作为JSON响应发送到请求端
         return JsonResponse({'data': entries_list}, safe=False)
     
+# def getAllMarks(request):
+#     if request.method == 'POST':
+#         databody = json.loads(request.body)
+#         print("databody:",databody)
+        
+#         openid = databody.get('openid')
+#         # 过滤出所有符合条件的条目
+#         matching_entries = models.Marks.objects.filter(isprivate=False)
+        
+#         # 将查询集转换为列表
+#         entries_list = list(matching_entries.values('id', 'modified_time','title','content','marks'))  # 根据需要选择字段
+#         print("entried_list:",entries_list)
+#         # 将列表作为JSON响应发送到请求端
+#         return JsonResponse({'data': entries_list}, safe=False)
+
+@require_http_methods(["GET"])
 def getAllMarks(request):
-    if request.method == 'POST':
-        databody = json.loads(request.body)
-        print("databody:",databody)
-        
-        openid = databody.get('openid')
-        # 过滤出所有符合条件的条目
-        matching_entries = models.Marks.objects.filter(isprivate=False)
-        
-        # 将查询集转换为列表
-        entries_list = list(matching_entries.values('id', 'modified_time','title','content','marks'))  # 根据需要选择字段
-        print("entried_list:",entries_list)
-        # 将列表作为JSON响应发送到请求端
-        return JsonResponse({'data': entries_list}, safe=False)
+    # 过滤出所有符合条件的条目（非私有的）
+    matching_entries = models.Marks.objects.filter(isprivate=False)
+    
+    # 将查询集转换为列表
+    entries_list = list(matching_entries.values('id', 'modified_time', 'title', 'content', 'marks'))
+    print("entried_list:",entries_list)
+    # 将列表作为JSON响应发送到请求端
+    return JsonResponse({'data': entries_list}, safe=False)
     
