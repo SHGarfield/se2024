@@ -47,8 +47,8 @@
 			<button v-if="!current_location.tourOrder" class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
 		</view>
 	</page-container>
-	<button v-if="!route_planned" class="routePlanning" @click="planRoute" v-show="!onSearching">路径规划</button>
-	<button v-else class="routePlanning" @click="clearRoute" v-show="!onSearching">隐藏路径</button>
+	<button v-if="!route_planned" class="routePlanning" @click="planRoute" v-show="!onSearching&&!modalVisible">路径规划</button>
+	<button v-else class="routePlanning" @click="clearRoute" v-show="!onSearching&&!modalVisible">隐藏路径</button>
 	<button class="saveRoute" @click="sendMarkersToServer" v-show="!onSearching&&!modalVisible">发送标记</button>
 	<view class="container">
 		<view class="modal" v-if="modalVisible">
