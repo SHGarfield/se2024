@@ -89,22 +89,6 @@ def getMarks(request):
         return JsonResponse({"status": "fail", "error": "仅支持POST请求"})
 
 
-# def getAllMarks(request):
-#     if request.method == 'POST':
-#         databody = json.loads(request.body)
-#         print("databody:",databody)
-
-#         openid = databody.get('openid')
-#         # 过滤出所有符合条件的条目
-#         matching_entries = models.Marks.objects.filter(isprivate=False)
-
-#         # 将查询集转换为列表
-#         entries_list = list(matching_entries.values('id', 'modified_time','title','content','marks'))  # 根据需要选择字段
-#         print("entried_list:",entries_list)
-#         # 将列表作为JSON响应发送到请求端
-#         return JsonResponse({'data': entries_list}, safe=False)
-
-
 @require_http_methods(["GET"])
 def getAllMarks(request):
     """
@@ -127,3 +111,32 @@ def getAllMarks(request):
     print("entried_list:", entries_list)
     # 将列表作为JSON响应发送到请求端
     return JsonResponse({"data": entries_list}, safe=False)
+
+@require_http_methods(["PUT"])  # 限制这个视图只接受PUT请求
+def setRouteIsPrivate(request):
+    """
+    设置一条路线的可见范围。
+    """
+    # 获取请求体中的数据
+    data = json.loads(request.body)
+    
+    # 获取请求体中的openid和isprivate字段
+    isprivate = data.get("isprivate")
+    openid = data.get("openid")
+    routeid=data.get("routeid")
+        
+    
+    # 过滤出所有符合条件的条目
+    matching_entries = models.Marks.objects.filter(
+            openid=openid, id=routeid
+        ).first()
+    #设置matching_entries的isprivate字段
+    matching_entries.isprivate=isprivate
+    matching_entries.save()
+    
+    # 响应请求
+    return JsonResponse({
+        'status': 'success',
+        'message': '设置可见范围成功',
+        'isprivate': isprivate  # 将接收到的数据回传给客户端
+    })
