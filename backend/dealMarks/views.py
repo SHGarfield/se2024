@@ -130,6 +130,11 @@ def setRouteIsPrivate(request):
     matching_entries = models.Marks.objects.filter(
             openid=openid, id=routeid
         ).first()
+    if matching_entries is None:
+        return JsonResponse({
+            'status': 'fail',
+            'message': '路线不存在',
+        })
     #设置matching_entries的isprivate字段
     matching_entries.isprivate=isprivate
     matching_entries.save()
