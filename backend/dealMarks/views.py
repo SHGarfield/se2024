@@ -140,3 +140,37 @@ def setRouteIsPrivate(request):
         'message': '设置可见范围成功',
         'isprivate': isprivate  # 将接收到的数据回传给客户端
     })
+    
+@require_http_methods(["PUT"])  # 限制这个视图只接受PUT请求
+def deleteRoute(request):
+    """
+    删除指定路线。
+    """
+    # 获取请求体中的数据
+    data = json.loads(request.body)
+    
+    # 获取请求体中的openid和isprivate字段
+    openid = data.get("openid")
+    routeid=data.get("routeid")
+        
+    
+    # 过滤出所有符合条件的条目
+    matching_entries = models.Marks.objects.filter(
+            openid=openid, id=routeid
+        ).first()
+    
+    #如果没找到匹配的路线（正常情况下不会发生）
+    if matching_entries is None:
+        return JsonResponse({
+            'status': 'fail',
+            'message': '路线不存在',
+        })
+        
+    #删除数据库中的matching_entries
+    matching_entries.delete()
+    
+    # 响应请求
+    return JsonResponse({
+        'status': 'success',
+        'message': '删除路线成功',
+    })

@@ -6,4 +6,5 @@ urlpatterns = [
     path('getMarks/', views.getMarks, name='getMarks'),
     path('getAllMarks/', views.getAllMarks, name='getAllMarks'),
     path('setRouteIsPrivate/', views.setRouteIsPrivate, name='setRouteIsPrivate'),
+    path('deleteRoute/', views.deleteRoute, name='deleteRoute'),
 ]
