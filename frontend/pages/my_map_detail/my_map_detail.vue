@@ -11,12 +11,16 @@
 			</view>
 		</scroll-view>
 		<view class="bottom-bar">
-			<picker mode="selector" :range="pickerRange" @change="onPickerChange">
-				<button class="change_isprivate" >修改可见范围</button>
-			</picker>
+			<button class="show-more" @click="showMore">更多</button>
 			<button class="save-route-button" @click="editRoute">编辑路线</button>
 		</view>
 	</view>
+	<page-container class="detail-panel" :show="showDetail" :round="true" :close-on-slide-down="true" @leave="leaveMore">
+		<picker mode="selector" :range="pickerRange" @change="onPickerChange">
+			<button class="change_isprivate">修改可见范围</button>
+		</picker>
+		<button @click="deleteRoute">删除帖子</button>
+	</page-container>
 </template>
 
 
@@ -32,8 +36,9 @@
 	} from '@dcloudio/uni-app';
 	// const isRefreshing = ref(false);
 	const itemData = ref({});
-	const pickerRange=ref(["公开可见","仅自己可见"]);
+	const pickerRange = ref(["公开可见", "仅自己可见"]);
 	const modified_time = ref("");
+	const showDetail=ref(false);
 	// const format_modified_time = () => {
 	// 	let time = getApp().globalData.modified_time;
 	// 	// 移除'T'和'Z'
@@ -50,6 +55,13 @@
 	onMounted(() => {
 		format_modified_time();
 	});
+	
+	const leaveMore=()=>{
+		showDetail.value=false;
+	}
+	const showMore=()=>{
+		showDetail.value=true;
+	}
 	const editRoute = () => {
 		wx.navigateTo({
 			url: '/pages/my_map_edit/my_map_edit'
@@ -66,8 +78,9 @@
 			setRouteIsPrivate(true);
 			console.log(2);
 		}
+		leaveMore();
 	};
-	
+
 	const setRouteIsPrivate = (isprivate) => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/setRouteIsPrivate/', // 后端API地址
@@ -98,7 +111,38 @@
 			}
 		});
 	};
-	
+	const deleteRoute=()=>{
+		wx.request({
+			url: 'http://111.229.117.144:8000/dealMarks/deleteRoute/', // 后端API地址
+			method: 'PUT',
+			data: {
+				openid: getApp().globalData.openid,
+				routeid: itemData.value.id
+			},
+			success: function(res) {
+				console.log('删除路线成功', res);
+				wx.showToast({
+					title: '删除成功', // 提示内容
+					icon: 'success', // 图标类型
+					duration: 1000 // 提示框停留时间
+				});
+				leaveMore();
+				setTimeout(function() {
+					backToMap();
+				}, 2000);
+			},
+			fail: function(err) {
+				console.error('数据提交失败', err);
+				leaveMore();
+				wx.showToast({
+					title: '网络不畅，删除失败', // 提示内容
+					icon: 'error', // 图标类型
+					duration: 1000 // 提示框停留时间
+				});
+			}
+		});
+	}
+
 	const saveRoute = () => {
 		//检查是否登录
 		if (getApp().globalData.openid) {
@@ -190,7 +234,7 @@
 		width: 98%;
 	}
 
-	.change_isprivate {
+	.show-more {
 		position: absolute;
 		top: 15rpx;
 		right: 300rpx;
@@ -204,7 +248,7 @@
 		border-radius: 60rpx;
 		font-weight: 400;
 		font-size: 27rpx;
-		width: 250rpx;
+		width: 160rpx;
 		height: 80rpx;
 	}
 

@@ -11,7 +11,6 @@
 			</view>
 		</scroll-view>
 		<view class="bottom-bar">
-			<!-- <button class="save-route-button" @click="saveRoute">编辑路线</button> -->
 			<button class="publish-button" @click="publish_route">发布</button>
 			<button class="save-button" @click="save_private_route">保存到路线草稿</button>
 		</view>
