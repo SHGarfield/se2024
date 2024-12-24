@@ -7,4 +7,5 @@ urlpatterns = [
     path('getAllMarks/', views.getAllMarks, name='getAllMarks'),
     path('setRouteIsPrivate/', views.setRouteIsPrivate, name='setRouteIsPrivate'),
     path('deleteRoute/', views.deleteRoute, name='deleteRoute'),
+    path('modifyMarks/', views.modifyMarks, name='modifyMarks'),
 ]

@@ -174,3 +174,41 @@ def deleteRoute(request):
         'status': 'success',
         'message': '删除路线成功',
     })
+
+@require_http_methods(["PUT"])  # 限制这个视图只接受PUT请求
+def modifyMarks(request):
+    """
+    修改指定路线。
+    """
+    
+    #获得请求体中的数据
+    databody = json.loads(request.body)
+    print("databody:", databody)
+
+    # 搜索对应路线并更新数据库信息
+    modifiedMark = models.Marks.objects.filter(
+            openid=databody["openid"], id=databody["routeid"]
+        ).first()
+    
+    #如果没找到匹配的路线（正常情况下不会发生）
+    if modifiedMark is None:
+        return JsonResponse({
+            'status': 'fail',
+            'message': '路线不存在',
+        })
+    
+    modifiedMark.title = databody["title"]
+    modifiedMark.content = databody["content"]
+    modifiedMark.marks = databody["marks"]
+
+    # 获取当前时间并存储
+    current_utc_time = datetime.now(timezone.utc)# 获取当前UTC时间
+    beijing_time = current_utc_time + timedelta(hours=8) # 将UTC时间转换为北京时间（UTC+8）
+    beijing_time = beijing_time.replace(microsecond=0)# 确保时间只精确到秒
+    modifiedMark.modified_time = beijing_time
+    modifiedMark.save()
+    
+    return JsonResponse({
+        'status': 'success',
+        'message': '修改路线成功',
+    })
