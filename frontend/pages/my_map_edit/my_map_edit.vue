@@ -11,8 +11,7 @@
 			</view>
 		</scroll-view>
 		<view class="bottom-bar">
-			<button class="publish-button" @click="publish_route">发布</button>
-			<button class="save-button" @click="save_private_route">保存到路线草稿</button>
+			<button class="save-button" @click="save_route">保存</button>
 		</view>
 	</view>
 </template>
@@ -49,25 +48,16 @@
 	const contentChange = (e) => {
 		itemData.value.content = e.detail.value;
 	};
-	const save_private_route = () => {
-		isprivate.value = true;
-		submitData();
-	}
-
-	const publish_route = () => {
-		isprivate.value = false;
-		submitData();
-	}
-	const submitData = () => {
+	const save_route = () => {
 		wx.request({
-			url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 后端API地址
-			method: 'POST',
+			url: 'http://111.229.117.144:8000/dealMarks/modifyMarks/', // 后端API地址
+			method: 'PUT',
 			data: {
 				openid: getApp().globalData.openid,
+				routeid: itemData.value.id,
 				title: itemData.value.title,
 				content: itemData.value.content,
 				marks: itemData.value.marks, // 这里需要页面A的数据传递机制
-				isprivate: isprivate.value
 			},
 			success: function(res) {
 				console.log('数据提交成功', res);

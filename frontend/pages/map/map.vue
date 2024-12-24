@@ -133,7 +133,7 @@
 			content: '',
 		}
 		wx.navigateTo({
-			url: '/pages/my_map_edit/my_map_edit'
+			url: '/pages/handInMap/handInMap'
 		});
 		console.log(getApp().globalData.markers);
 		// wx.request({

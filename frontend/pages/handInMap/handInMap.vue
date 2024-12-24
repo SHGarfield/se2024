@@ -11,7 +11,7 @@
 			</view>
 		</scroll-view>
 		<view class="bottom-bar">
-			<!-- <button class="save-route-button" @click="saveRoute">编辑路线</button> -->
+			<button class="publish-button" @click="publish_route">发布</button>
 			<button class="save-button" @click="save_private_route">保存到路线草稿</button>
 		</view>
 	</view>
@@ -27,6 +27,8 @@
 		onShow
 	} from '@dcloudio/uni-app';
 
+	//判断发布还是存到草稿箱
+	const isprivate = ref(true);
 	//存储帖子内容
 	const itemData=ref({});
 	
@@ -36,8 +38,8 @@
 	});
 	//获取帖子内容
 	const getItemData = () => {
-		itemData.value.marks = getApp().globalData.markers;
-		console.log("itemData:(handinmap)", itemData.value);
+		itemData.value = getApp().globalData.itemData;
+		console.log("itemData:(edit)", itemData.value);
 	};
 	//根据用户输入，更新title
 	const titleChange = (e) => {
@@ -48,9 +50,14 @@
 		itemData.value.content = e.detail.value;
 	};
 	const save_private_route = () => {
+		isprivate.value = true;
 		submitData();
 	}
 
+	const publish_route = () => {
+		isprivate.value = false;
+		submitData();
+	}
 	const submitData = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 后端API地址
@@ -60,7 +67,7 @@
 				title: itemData.value.title,
 				content: itemData.value.content,
 				marks: itemData.value.marks, // 这里需要页面A的数据传递机制
-				isprivate: true,
+				isprivate: isprivate.value
 			},
 			success: function(res) {
 				console.log('数据提交成功', res);
@@ -85,7 +92,7 @@
 	};
 	const backToMap = () => {
 		wx.navigateBack({
-			delta: 1
+			delta: 2
 		})
 	};
 </script>
@@ -96,9 +103,11 @@
 		flex-direction: column;
 		height: 100vh;
 		border:2px solid green;
+		/* 使容器高度为视口高度 */
 	}
 
 	.item-text {
+		/* border: 10px solid black; */
 		padding: 10rpx;
 		display: flex;
 		flex-direction: column;
@@ -106,6 +115,8 @@
 	}
 
 	.bottom-bar {
+		/* border: 10px solid black; */
+		/* padding:100rpx; */
 		position: absolute;
 		background-color: #eaeaea;
 		bottom: 0;
@@ -115,6 +126,8 @@
 	}
 
 	button {
+		/* border: 10px solid black; */
+		/* margin-left:60%; */
 		position: absolute;
 		top: 15rpx;
 		right: 30rpx;
@@ -149,6 +162,8 @@
 	.scroll-list {
 		display: flex;
 		flex-direction: column;
+		/* 减去用户卡片的高度、tabbar高度和间距 */
+		/* margin-top: 20rpx; */
 		background-color: #f5f5f5;
 		height: 100vh;
 	}
@@ -170,11 +185,69 @@
 		padding: 0 2%;
 		font-size: 35rpx;
 		height:360rpx;
+		/* font-weight: 800; */
 	}
 
 	.modified-time {
 		padding: 0 20rpx;
 		font-size: 30rpx;
 		color: gray;
+		/* font-weight: 800; */
 	}
+
+	/* //////////////////////////////////////////////////////////////// */
+	/* 页面整体容器样式 */
+	/* 	.view-container {
+	  display: flex;
+	  flex-direction: column;
+	  height: 100vh; 
+	  padding: 10px;
+	} */
+
+	/* 输入框样式 */
+	/* 	.input-text {
+	  width: 100%;
+	  padding: 8px;
+	  height: 50px;
+	  margin-bottom: 10px;
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  box-sizing: border-box;
+	} */
+
+	/* 标题样式 */
+	/* 	.title-input {
+	  font-size: 24px; 
+	  font-weight: bold; 
+	  margin-bottom: 10px;
+	} */
+
+	/* 文本区域样式 */
+	/* 	.textarea-content {
+	width: 100%;
+	  flex: 1; 
+	  padding: 8px;
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  box-sizing: border-box;
+	  margin-bottom: 10px;
+	  resize: none; 
+	} */
+
+	/* button {
+		width: 50%;
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 16px;
+		margin-bottom: 40px;
+		border-radius: 40rpx;
+	}
+
+	button:hover {
+		background-color: #0056b3;
+	} */
 </style>

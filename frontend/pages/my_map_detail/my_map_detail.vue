@@ -15,11 +15,12 @@
 			<button class="save-route-button" @click="editRoute">编辑路线</button>
 		</view>
 	</view>
-	<page-container class="detail-panel" :show="showDetail" :round="true" :close-on-slide-down="true" @leave="leaveMore">
+	<page-container class="detail-panel" :show="showDetail" :round="true" :close-on-slide-down="true"
+		@leave="leaveMore">
 		<picker mode="selector" :range="pickerRange" @change="onPickerChange">
 			<button class="change_isprivate">修改可见范围</button>
 		</picker>
-		<button @click="deleteRoute">删除帖子</button>
+		<button class="delete-route" @click="deleteRoute">删除帖子</button>
 	</page-container>
 </template>
 
@@ -38,7 +39,7 @@
 	const itemData = ref({});
 	const pickerRange = ref(["公开可见", "仅自己可见"]);
 	const modified_time = ref("");
-	const showDetail=ref(false);
+	const showDetail = ref(false);
 	// const format_modified_time = () => {
 	// 	let time = getApp().globalData.modified_time;
 	// 	// 移除'T'和'Z'
@@ -55,12 +56,12 @@
 	onMounted(() => {
 		format_modified_time();
 	});
-	
-	const leaveMore=()=>{
-		showDetail.value=false;
+
+	const leaveMore = () => {
+		showDetail.value = false;
 	}
-	const showMore=()=>{
-		showDetail.value=true;
+	const showMore = () => {
+		showDetail.value = true;
 	}
 	const editRoute = () => {
 		wx.navigateTo({
@@ -99,7 +100,7 @@
 				});
 				setTimeout(function() {
 					backToMap();
-				}, 2000);
+				}, 1500);
 			},
 			fail: function(err) {
 				console.error('数据提交失败', err);
@@ -111,7 +112,7 @@
 			}
 		});
 	};
-	const deleteRoute=()=>{
+	const deleteRoute = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/deleteRoute/', // 后端API地址
 			method: 'PUT',
@@ -129,7 +130,7 @@
 				leaveMore();
 				setTimeout(function() {
 					backToMap();
-				}, 2000);
+				}, 1500);
 			},
 			fail: function(err) {
 				console.error('数据提交失败', err);
@@ -221,6 +222,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 20rpx;
+	}
+
+	.delete-route {
+		color: red;
 	}
 
 	.bottom-bar {
