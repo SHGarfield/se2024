@@ -2,7 +2,8 @@
 	<view class="list-section">
 		<scroll-view class="scroll-list" scroll-y>
 			<view class="list-content">
-				<map class="item-map" :markers="itemData.marks" :include-points="itemData.marks"></map>
+				<map class="item-map" :markers="itemData.marks" :include-points="itemData.marks"
+					:polyline="polyline"></map>
 				<view class="item-text">
 					<text class="item-title">{{itemData.title}}</text>
 					<text class="item-content">{{itemData.content}}</text>
@@ -31,11 +32,15 @@
 		computed,
 		onMounted
 	} from 'vue'
+	import {
+		setupQQMap
+	} from '../../libs/functions/setupQQMap.js';
 
 	import {
 		onShow
 	} from '@dcloudio/uni-app';
 	// const isRefreshing = ref(false);
+	const polyline = ref([]);
 	const itemData = ref({});
 	const pickerRange = ref(["公开可见", "仅自己可见"]);
 	const modified_time = ref("");
@@ -50,9 +55,18 @@
 	const format_modified_time = () => {
 		itemData.value.modified_time = '编辑于' + itemData.value.modified_time.replace(/T/, '  ').replace(/Z/, '');
 	};
+	const qqmapsdk = ref(null);
+	//每次打开界面都获取帖子内容
 	onShow(() => {
+		setupQQMap(qqmapsdk);
 		getItemData();
 	});
+	//获取帖子内容
+	const getItemData = () => {
+		itemData.value = getApp().globalData.itemData;
+		console.log("itemData:(edit)", itemData.value);
+		planRoute();
+	};
 	onMounted(() => {
 		format_modified_time();
 	});
@@ -171,11 +185,6 @@
 			});
 		}
 	};
-
-	const getItemData = () => {
-		itemData.value = getApp().globalData.itemData;
-		console.log("itemData:(detail)", itemData.value);
-	};
 	const submitData = () => {
 		wx.request({
 			url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 后端API地址
@@ -213,6 +222,62 @@
 			delta: 1
 		})
 	};
+	//设置所有点串联的路线
+	const planRoute = () => {
+		for (let i = 1; i < itemData.value.marks.length; i++) {
+			console.log("route:", i)
+			planRouteAtom(itemData.value.marks[i - 1], itemData.value.marks[i]);
+		}
+	}
+
+	//设置相邻两点路线
+	const planRouteAtom = (start, end) => {
+		qqmapsdk.value.direction({
+			mode: 'driving', // 可选值：'driving'（驾车）、'walking'（步行）、'bicycling'（骑行），不填默认：'driving',可不填
+			from: start, // 从表单中获取起始点
+			to: end, // 从表单中获取目的地
+			// from: state.markers[state.markers.length - 2],
+			// to: state.markers[state.markers.length - 1],
+			success: function(res) {
+				console.log("res(planRoute)", res);
+				var ret = res;
+				var coors = ret.result.routes[0].polyline,
+					pl = [];
+				// 坐标解压（返回的点串坐标，通过前向差分进行压缩）
+				var kr = 1000000;
+				for (var i = 2; i < coors.length; i++) {
+					coors[i] = Number(coors[i - 2]) + Number(coors[i]) / kr;
+				}
+				// 将解压后的坐标放入点串数组pl中
+				for (var i = 0; i < coors.length; i += 2) {
+					pl.push({
+						latitude: coors[i],
+						longitude: coors[i + 1]
+					});
+				}
+				console.log("pl:", pl);
+				// 设置polyline属性，将路线显示出来,将解压坐标第一个数据作为起点
+				// latitude.value = pl[0].latitude;
+				// longitude.value = pl[0].longitude;
+				polyline.value.push({
+					points: pl,
+					color: '#FF0000DD',
+					width: 4,
+					duration: res.result.routes[0].duration,
+					distance: res.result.routes[0].distance,
+					taxi_fare: res.result.routes[0].taxi_fare.fare,
+					arrowLine: true
+				});
+				console.log("polyline:", polyline);
+			},
+			fail: function(error) {
+				console.error(error);
+			},
+			complete: function(res) {
+				console.log(res);
+			}
+		});
+	}
 </script>
 
 <style>
