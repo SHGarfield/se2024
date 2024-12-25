@@ -55,7 +55,7 @@
 	});
 	const saveRoute = () => {
 		//检查是否登录
-		if (getApp().globalData.openid) {
+		if (getApp().globalData.isLogin) {
 			//已登录
 			submitData();
 		} else {

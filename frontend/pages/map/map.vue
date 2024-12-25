@@ -47,7 +47,8 @@
 			<button v-if="!current_location.tourOrder" class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
 		</view>
 	</page-container>
-	<button v-if="!route_planned" class="routePlanning" @click="planRoute" v-show="!onSearching&&!modalVisible">路径规划</button>
+	<button v-if="!route_planned" class="routePlanning" @click="planRoute"
+		v-show="!onSearching&&!modalVisible">路径规划</button>
 	<button v-else class="routePlanning" @click="clearRoute" v-show="!onSearching&&!modalVisible">隐藏路径</button>
 	<button class="saveRoute" @click="sendMarkersToServer" v-show="!onSearching&&!modalVisible">发送标记</button>
 	<view class="container">
@@ -124,37 +125,39 @@
 		getApp().globalData.marks = state.markers;
 	})
 	const sendMarkersToServer = async () => {
-
-
-		// getApp().globalData.markers=state.markers;
-		getApp().globalData.itemData = {
-			marks: state.markers,
-			title: '',
-			content: '',
+		console.log("ifLogin?",getApp().globalData.isLogin);
+		//检查是否登录
+		if (getApp().globalData.isLogin) {
+			getApp().globalData.itemData = {
+				marks: state.markers,
+				title: '',
+				content: '',
+			}
+			wx.navigateTo({
+				url: '/pages/handInMap/handInMap'
+			});
+			console.log(getApp().globalData.markers);
+		} else {
+			//未登录，则展示登录提示框
+			wx.showModal({
+				title: '未登录', // 提示框的标题
+				content: '登录后才可使用该功能', // 提示框的内容
+				confirmText: '去登录', // 自定义确定按钮的文本
+				cancelText: '取消',
+				success: function(res) {
+					if (res.confirm) {
+						console.log('用户点击确定');
+						wx.switchTab({
+							url: '/pages/my/my'
+						});
+						// 在这里编写点击确定后想要执行的代码
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+						// 在这里编写点击取消后想要执行的代码
+					}
+				}
+			});
 		}
-		wx.navigateTo({
-			url: '/pages/handInMap/handInMap'
-		});
-		console.log(getApp().globalData.markers);
-		// wx.request({
-		// 	url: 'http://111.229.117.144:8000/dealMarks/addMarks/', // 你的后端服务器地址
-		// 	method: 'POST',
-		// 	data: {
-		// 		openid:"openid",
-		// 		title:"title",
-		// 		content:"content",
-		// 		marks:state.markers,
-		// 	},
-		// 	header: {
-		// 		'content-type': 'application/json' // 设置请求的 header
-		// 	},
-		// 	success: function(res) {
-		// 		console.log("success")
-		// 	},
-		// 	fail: function(error) {
-		// 		console.log("error")
-		// 	}
-		// });
 	};
 
 
@@ -588,7 +591,7 @@
 
 	const clearRoute = () => {
 		route_planned.value = false;
-		polyline.value.length=0;
+		polyline.value.length = 0;
 	};
 
 	//设置所有点串联的路线
@@ -644,7 +647,7 @@
 					duration: res.result.routes[0].duration,
 					distance: res.result.routes[0].distance,
 					taxi_fare: res.result.routes[0].taxi_fare.fare,
-					arrowLine:true
+					arrowLine: true
 				});
 				console.log("polyline:", polyline);
 			},
