@@ -50,7 +50,8 @@
 	<button v-if="!route_planned" class="routePlanning" @click="planRoute"
 		v-show="!onSearching&&!modalVisible">路径规划</button>
 	<button v-else class="routePlanning" @click="clearRoute" v-show="!onSearching&&!modalVisible">隐藏路径</button>
-	<button class="saveRoute" @click="sendMarkersToServer" v-show="!onSearching&&!modalVisible">发送标记</button>
+	<button class="saveRoute" @click="sendMarkersToServer" v-show="!onSearching&&!modalVisible">发布路线</button>
+	<button class="clearMarks" @click="clearMarks" v-show="!onSearching&&!modalVisible">清空标点</button>
 	<view class="container">
 		<view class="modal" v-if="modalVisible">
 			<view class="modalPage">
@@ -124,6 +125,10 @@
 	onHide(() => {
 		getApp().globalData.marks = state.markers;
 	})
+	const clearMarks=()=>{
+		state.markers.length=0;
+		clearRoute();
+	}
 	const sendMarkersToServer = async () => {
 		if (state.markers.length === 0) {
 			wx.showToast({
@@ -404,8 +409,8 @@
 					standard_address: e.detail.name,
 					tourOrder: undefined,
 					tourDate: undefined,
-					width: 30,
-					height: 50,
+					width: 100,
+					height: 120,
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
@@ -759,6 +764,25 @@
 		background-color: #007aff;
 		bottom: 5vh;
 		left: 50rpx;
+		/* 确保搜索栏在地图上方 */
+		z-index: 10;
+		border-radius: 50%;
+		/* 水平偏移 0px，垂直偏移 4px，模糊半径 10px，颜色为黑色，透明度为 0.3 */
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+	}
+	.clearMarks {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		font-size: 30rpx;
+		line-height: 1.1;
+		width: 120rpx;
+		height: 120rpx;
+		padding: 20rpx;
+		color: white;
+		background-color: #f15c5c;
+		bottom: 17vh;
+		right: 50rpx;
 		/* 确保搜索栏在地图上方 */
 		z-index: 10;
 		border-radius: 50%;
