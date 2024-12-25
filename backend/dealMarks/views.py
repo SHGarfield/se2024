@@ -24,7 +24,6 @@ def addMarks(request):
     if request.method == "POST":
         #获得请求体中的数据
         databody = json.loads(request.body)
-        print("databody:", databody)
 
         # 创建一个新的实例并存储JSON数组数据
         new_instance = models.Marks()
@@ -58,7 +57,6 @@ def getMarks(request):
     """
     if request.method == "POST":
         databody = json.loads(request.body)
-        print("databody:", databody)
 
         # 获取请求体中的openid和isprivate字段
         isprivate = databody.get("isprivate")
@@ -80,7 +78,6 @@ def getMarks(request):
         entries_list = list(
             matching_entries.values("id", "modified_time", "title", "content", "marks")
         ) 
-        print("entried_list:", entries_list)
         
         # 将列表作为JSON响应发送到请求端
         return JsonResponse({"data": entries_list}, safe=False)
@@ -108,7 +105,6 @@ def getAllMarks(request):
     entries_list = list(
         matching_entries.values("id", "modified_time", "title", "content", "marks")
     )
-    print("entried_list:", entries_list)
     # 将列表作为JSON响应发送到请求端
     return JsonResponse({"data": entries_list}, safe=False)
 
@@ -188,7 +184,6 @@ def modifyMarks(request):
     
     #获得请求体中的数据
     databody = json.loads(request.body)
-    print("databody:", databody)
 
     # 搜索对应路线并更新数据库信息
     modifiedMark = models.Marks.objects.filter(

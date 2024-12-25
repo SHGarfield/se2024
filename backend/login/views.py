@@ -26,12 +26,10 @@ def wechat_login(request):
     Returns:
         JsonResponse: 包含登录状态和用户信息的JSON响应
     """
-    print("\n---[wechat_login]---")
     if request.method == "POST":
         # 从微信服务器获取openid
         response = getOpenIdFromWechat(request)
         response_data = json.loads(response.text)
-        print("response_data: ", response_data)
 
         # 如果没有获取到openid，返回错误信息
         if "openid" not in response_data:
@@ -40,7 +38,6 @@ def wechat_login(request):
         # 通过openid查询用户是否在数据库中
         if isUserOpenIdExist(response_data["openid"]) == True:
             # 如果存在，则返回username和openid
-            print(f"openid:{response_data['openid']}(已存在)")
             # 到数据库中找到openid对应的用户信息
             userinfo = models.UserInfo.objects.filter(
                 openid=response_data["openid"]
@@ -55,7 +52,6 @@ def wechat_login(request):
             )
         else:
             # 如果不存在，只返回openid
-            print(f"openid:{response_data['openid']}(不存在)")
             return JsonResponse(
                 {
                     "status": "success",
@@ -80,10 +76,8 @@ def getOpenIdFromWechat(request):
     """
     # 获得数据报
     data = json.loads(request.body)
-    print("request_body", data)
     # 从主体内容中提取code
     code = data.get("code")
-    print("code", code)
     # 将code和小程序验证信息发送给微信服务器
     appid = "wxb5dbc4b4be36808f"
     secret = "fff193612d5d2bea5e85689abe27e14a"
@@ -116,11 +110,9 @@ def upload_username(request):
     Returns:
         JsonResponse: 包含操作结果的JSON响应
     """
-    print("\n---[upload_username]---")
     if request.method == "POST":
         # 获得数据报
         data = json.loads(request.body)
-        print("request_body", data)
         # 从主体内容中提取openid和昵称
         openid = data.get("openid")
         nickname = data.get("nickname")
