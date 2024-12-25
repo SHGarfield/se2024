@@ -1,6 +1,5 @@
 <template>
 	<view class="list-section">
-		<text class="section-title" @click="updateListData">我的计划</text>
 		<scroll-view class="scroll-list" scroll-y :refresher-enabled="true" @refresherrefresh="handleRefresh"  :refresher-triggered="isRefreshing">
 			<view v-if="listData.length === 0" class="empty-message">这里空空如也</view>
 			<view v-else class="list-content">
@@ -23,28 +22,7 @@
 	} from 'vue'
 	import { onShow } from '@dcloudio/uni-app';
 	const isRefreshing = ref(false);
-	const listData = ref([{
-			image: '/static/logo.png',
-			title: '标题1'
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题2',
-			content: "这里是中文内容谭工后方弄i给i哦能够对弄i给我答复农人辜负你的哦个肉共哦代购哦i工具都是给弄"
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题3'
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题4'
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题5'
-		},
-	])
+	const listData = ref([]);
 	const handlePlan = (itemData) => {
 		getApp().globalData.itemData = itemData;
 		console.log("itemData",itemData);
@@ -91,7 +69,7 @@
 	}
 	.list-section {
 		position: relative;
-		padding-top: 60rpx;
+		/* padding-top: 60rpx; */
 		/* 为标题留出空间 */
 	}
 
@@ -112,11 +90,12 @@
 	}
 
 	.scroll-list {
-		height: calc(75vh - 120rpx);
+		padding-top: 2vh;
+		height: 100vh;
 		/* 减去用户卡片的高度、tabbar高度和间距 */
-		margin-top: 20rpx;
+		/* margin-top: 20rpx; */
 		background-color: #f5f5f5;
-		min-height: 100vh;
+		/* min-height: 100vh; */
 	}
 
 	.item-card {
@@ -124,7 +103,7 @@
 		border-radius: 30rpx;
 		display: flex;
 		flex-direction: column;
-		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
 		overflow:hidden;
 	}
 
