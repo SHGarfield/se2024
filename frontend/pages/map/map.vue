@@ -409,8 +409,8 @@
 					standard_address: e.detail.name,
 					tourOrder: undefined,
 					tourDate: undefined,
-					width: 100,
-					height: 120,
+					width: 30,
+					height: 50,
 				};
 				// current_marker.value = newMarker;
 				Object.assign(current_location.value, newMarker);
