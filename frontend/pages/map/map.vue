@@ -125,38 +125,45 @@
 		getApp().globalData.marks = state.markers;
 	})
 	const sendMarkersToServer = async () => {
-		console.log("ifLogin?",getApp().globalData.isLogin);
-		//检查是否登录
-		if (getApp().globalData.isLogin) {
-			getApp().globalData.itemData = {
-				marks: state.markers,
-				title: '',
-				content: '',
-			}
-			wx.navigateTo({
-				url: '/pages/handInMap/handInMap'
+		if (state.markers.length === 0) {
+			wx.showToast({
+				title: '不能分享空路线哦', // 提示内容
+				icon: 'error', // 图标类型
+				duration: 1500 // 提示框停留时间
 			});
-			console.log(getApp().globalData.markers);
 		} else {
-			//未登录，则展示登录提示框
-			wx.showModal({
-				title: '未登录', // 提示框的标题
-				content: '登录后才可使用该功能', // 提示框的内容
-				confirmText: '去登录', // 自定义确定按钮的文本
-				cancelText: '取消',
-				success: function(res) {
-					if (res.confirm) {
-						console.log('用户点击确定');
-						wx.switchTab({
-							url: '/pages/my/my'
-						});
-						// 在这里编写点击确定后想要执行的代码
-					} else if (res.cancel) {
-						console.log('用户点击取消');
-						// 在这里编写点击取消后想要执行的代码
-					}
+			//检查是否登录
+			if (getApp().globalData.isLogin) {
+				getApp().globalData.itemData = {
+					marks: state.markers,
+					title: '',
+					content: '',
 				}
-			});
+				wx.navigateTo({
+					url: '/pages/handInMap/handInMap'
+				});
+				console.log(getApp().globalData.markers);
+			} else {
+				//未登录，则展示登录提示框
+				wx.showModal({
+					title: '未登录', // 提示框的标题
+					content: '登录后才可使用该功能', // 提示框的内容
+					confirmText: '去登录', // 自定义确定按钮的文本
+					cancelText: '取消',
+					success: function(res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							wx.switchTab({
+								url: '/pages/my/my'
+							});
+							// 在这里编写点击确定后想要执行的代码
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+							// 在这里编写点击取消后想要执行的代码
+						}
+					}
+				});
+			}
 		}
 	};
 
