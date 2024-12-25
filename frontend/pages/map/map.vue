@@ -269,6 +269,7 @@
 		updateAddedOrder();
 		updateId();
 		clearDateSelecter();
+		clearRoute();
 	}
 	const findMarkerIndexByDate = (targetTourDate, targetTourOrder) => {
 		const index = state.markers.findIndex(marker =>
@@ -345,6 +346,7 @@
 	const onSearch = () => {
 		searchLocation(searchText.value);
 		unshowDetailPanel();
+		clearRoute();
 	};
 
 
