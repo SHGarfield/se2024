@@ -546,6 +546,7 @@
 		state.markers.splice(findMarkerById(state.markers, current_location.value.id), 1);
 		updateId();
 		unshowDetailPanel();
+		clearRoute();
 	}
 
 	const updateId = () => {
