@@ -98,28 +98,7 @@
 	const nickname = ref("");
 	const isLogin = ref(false); // 自动暴露给模板使用
 	const isprivate = ref(true);
-	const listData = ref([{
-			image: '/static/logo.png',
-			title: '标题1'
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题2',
-			content: "这里是中文内容谭工后方弄i给i哦能够对弄i给我答复农人辜负你的哦个肉共哦代购哦i工具都是给弄"
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题3'
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题4'
-		},
-		{
-			image: '/static/logo.png',
-			title: '标题5'
-		},
-	])
+	const listData = ref([])
 	const isPublishedActive = ref(false);
 	const isPrivateActive = ref(true);
 
@@ -363,11 +342,21 @@
 		padding: 20rpx 20rpx 5rpx 20rpx;
 		font-size: 40rpx;
 		font-weight: 800;
+		
+		 display: -webkit-box;
+		  -webkit-box-orient: vertical;
+		  -webkit-line-clamp: 1; /* 限制文本的行数为4行 */
+		  overflow: hidden;
 	}
 
 	.item-content {
 		padding: 0 20rpx;
 		font-size: 35rpx;
+		
+		 display: -webkit-box;
+		  -webkit-box-orient: vertical;
+		  -webkit-line-clamp: 3; /* 限制文本的行数为4行 */
+		  overflow: hidden;
 		/* font-weight: 800; */
 	}
 </style>

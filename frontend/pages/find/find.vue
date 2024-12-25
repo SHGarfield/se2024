@@ -6,7 +6,7 @@
 				<view class="item-card" v-for="(item, index) in listData" :key="index"
 					@click="() => handlePlan(item)">
 					<text class="item-title">{{item.title}}</text>
-					<text class="item-content">{{item.content}}</text>
+					<text class="item-content" :overflow="ellipsis" :max-lines="4">{{item.content}}</text>
 					<!-- <image class="item-image" :src="item.image" mode="aspectFill"></image> -->
 					<map class="item-map" :markers="item.marks" :include-points="item.marks"
 						style="pointer-events: none;"></map>
@@ -117,11 +117,19 @@
 		padding: 20rpx 20rpx 5rpx 20rpx;
 		font-size: 40rpx;
 		font-weight: 800;
+		 display: -webkit-box;
+		  -webkit-box-orient: vertical;
+		  -webkit-line-clamp: 1; /* 限制文本的行数为4行 */
+		  overflow: hidden;
 	}
 
 	.item-content {
 		padding: 0 20rpx;
 		font-size: 35rpx;
+		 display: -webkit-box;
+		  -webkit-box-orient: vertical;
+		  -webkit-line-clamp: 3; /* 限制文本的行数为4行 */
+		  overflow: hidden;
 		/* font-weight: 800; */
 	}
 </style>
