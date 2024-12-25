@@ -45,10 +45,25 @@
 						getApp().globalData.username = nickname;
 						getApp().globalData.isLogin=true;
 						console.log('nickname', nickname, 'globalnick', getApp().globalData.username);
+						wx.showToast({
+							title: '更新信息成功', // 提示内容
+							icon: 'success', // 图标类型
+							duration: 1500 // 提示框停留时间
+						});
+						setTimeout(function() {
+							wx.navigateBack({
+								delta: 1
+							})
+						}, 2000);
 					},
 					fail: function(err) {
 						console.error('nickname失败', err);
-					}
+						wx.showToast({
+							title: '登陆失败', // 提示内容
+							icon: 'error', // 图标类型
+							duration: 1500 // 提示框停留时间
+						});
+					},
 				});
 			},
 			// 点击登录按钮
@@ -64,16 +79,6 @@
 						});
 					} else {
 						await this.uploadUsername(this.nickName);
-						wx.showToast({
-							title: '更新信息成功', // 提示内容
-							icon: 'success', // 图标类型
-							duration: 1500 // 提示框停留时间
-						});
-						setTimeout(function() {
-							wx.navigateBack({
-								delta: 1
-							})
-						}, 2000);
 					}
 				} catch (error) {
 					console.error('获取用户信息失败:', error);
