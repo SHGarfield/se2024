@@ -26,7 +26,7 @@
 	const handlePlan = (itemData) => {
 		getApp().globalData.itemData = itemData;
 		console.log("itemData",itemData);
-		wx.redirectTo({
+		wx.navigateTo({
 			url:'/pages/find_detail/find_detail'
 		});
 	}
