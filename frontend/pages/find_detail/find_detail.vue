@@ -115,7 +115,7 @@
 				});
 				setTimeout(function() {
 					backToMap();
-				}, 2000);
+				}, 1000);
 			},
 			fail: function(err) {
 				console.error('数据提交失败', err);

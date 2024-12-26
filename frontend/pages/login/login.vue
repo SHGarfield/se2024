@@ -54,7 +54,7 @@
 							wx.navigateBack({
 								delta: 1
 							})
-						}, 2000);
+						}, 1500);
 					},
 					fail: function(err) {
 						console.error('nickname失败', err);
