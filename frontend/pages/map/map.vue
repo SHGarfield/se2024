@@ -18,7 +18,7 @@
 		<view class="detail-content">
 			<text v-if="current_location.tourDate" class="dateDetail">第{{current_location.tourDate}}天
 				第{{current_location.tourOrder}}个行程</text>
-			<text>id：{{current_location.id}}\n</text>
+			<!-- <text>id：{{current_location.id}}\n</text> -->
 			<view class="detail-title">
 				<text class="locationStandard">{{ current_location.standard_address}}</text>
 				<text v-if="current_location.rating" class="rating">{{current_location.rating}}分️</text>
@@ -264,12 +264,13 @@
 	};
 
 	const confirmDate = () => {
+		if(pickerValue2.value!="请选择"){
 		hideModal();
 		addMarker();
 		updateAddedOrder();
 		updateId();
 		clearDateSelecter();
-		clearRoute();
+		clearRoute();}
 	}
 	const findMarkerIndexByDate = (targetTourDate, targetTourOrder) => {
 		const index = state.markers.findIndex(marker =>
