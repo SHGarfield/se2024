@@ -43,7 +43,8 @@
 					{{ beginDate }}出发
 				</view>
 			</picker>
-			<button class="deleteMarkerButton" @click="deleteMarker" v-show="!onSearching">移出行程</button>
+			<button v-if="current_location.tourOrder" class="deleteMarkerButton" @click="deleteMarker" v-show="!onSearching">移出行程</button>
+			<button v-else class="deleteMarkerButton" @click="deleteMarker" v-show="!onSearching">清除标点</button>
 			<button v-if="!current_location.tourOrder" class="addMarkerButton" @click="addMarkerToRoute">加入行程</button>
 		</view>
 	</page-container>
